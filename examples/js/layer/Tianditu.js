@@ -208,7 +208,7 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
             //var minResolution = 0.5971642833709717;
 
             var resolutions = [];
-            for(var i=resStart;i<=resLen;i++){
+            for(var i=resStart;i<resLen;i++){
                 resolutions.push(1.40625/2/Math.pow(2,i));
             }
 
@@ -231,7 +231,7 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
             //var minResolution = 0.5971642833709717;
 
             var resolutions = [];
-            for(var i=resStart;i<=resLen;i++){
+            for(var i=resStart;i<resLen;i++){
                 resolutions.push(156543.0339/2/Math.pow(2,i));
             }
             //this.numZoomLevels = 18;

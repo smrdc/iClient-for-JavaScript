@@ -632,7 +632,8 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
                 coordUnit = mapStatus.coordUnit,
                 viewer = mapStatus.viewer,
                 scale = mapStatus.scale,
-                datumAxis = mapStatus.datumAxis;
+                datumAxis = mapStatus.datumAxis,
+                projCode = mapStatus.prjCode;
             //将jsonObject转化为SuperMap.Bounds，用于计算dpi。
             viewBounds = new SuperMap.Bounds(viewBounds.left, viewBounds.bottom, viewBounds.right, viewBounds.top);
             me.viewBounds = viewBounds;
@@ -649,7 +650,9 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
             me.datumAxis = datumAxis;
 
             me.dpi = SuperMap.Util.calculateDpi(viewBounds, viewer, scale, me.units, datumAxis);
-
+            if(!me.projection&&projCode){
+                me.projection = "EPSG:" + projCode;
+            }
             if (!!SuperMap.isApp) {
                 //window.plugins.localstoragemanager.savaconfig(this.name,mapStatus);
                 cordova.exec(function () {
