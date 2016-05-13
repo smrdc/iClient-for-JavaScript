@@ -3,7 +3,7 @@
  *
  * 使用 直接引入 <script src="./js/GoTop.js" id="js_gotop"></script>
  */
-window.onload = function() {
+(function() {
     //获取当前js路径 然后处理图片路径 即绝对路径 （避免在多处引用图片路径不对）
     var path = document.getElementById('js_gotop').src;
     path_out = path.replace("js/GoTop.js","images/gotop_out.png");
@@ -137,6 +137,6 @@ window.onload = function() {
             },speed)
         }
     }
-};
+})();
 
 
