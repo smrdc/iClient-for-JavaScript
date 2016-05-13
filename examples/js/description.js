@@ -14,7 +14,6 @@ DemoDescription['google'] = {title: 'Google图层', desc: '使用Google的API创
 DemoDescription['arcGIS93Rest']={title:'ArcGIS图层',desc:'使用ArcGIS的API创建地图，通过iConnector叠加iServer生成的单值专题图', oper: '点击左上角的按钮可以叠加全国各省面积单值专题图。' }
 DemoDescription['baidu'] = {title: 'Baidu图层', desc: '使用Baidu的API创建百度地图，通过iConnector叠加iserver生成的等级符号专题图', oper: '点击左上角的按钮可以叠加中国各省面积等级符号专题图。' }
 DemoDescription['aMap'] = {title: 'AMap图层', desc: '使用AMap的API创建高德地图，通过iConnector叠加iserver生成的点密度专题图', oper: '点击左上角的按钮可以叠加全球点密度专题图。' }
-DemoDescription['mapABC'] = {title: 'mapABC图层', desc: '使用mapABC的API创建地图，通过iConnector叠加iserver生成的点密度专题图', oper: '点击左上角的按钮可以叠加全球点密度专题图。' }
 
 DemoDescription['leaflet']={title:'LeafLet图层',desc:'使用Leaflet的API创建OpenStreetMap地图，通过iConnector叠加iServer生成的点密度专题图', oper: '点击左上角的按钮可以叠加点密度专题图。' }
 DemoDescription['mapBox']={title:'MapBox图层',desc:'使用MapBox的API创建OpenStreetMap地图，通过iConnector叠加iServer生成的点密度专题图。支持IE10以上版本。mapbox.js是基于leaflet开发的，iConnector原理一样。', oper: '点击左上角的按钮可以叠加点密度专题图。' }
@@ -184,6 +183,7 @@ DemoDescription['a0mapPrint'] = {title: '地图A0大幅打印', desc: '定义：
 DemoDescription['projection'] = {title: '投影转换', desc: '定义：实现客户端的坐标投影转换。', oper:'实现EPSG:3857向EPSG:4326的转换，在地图上移动鼠标位置，会显示转换后的鼠标位置的坐标。' }
 DemoDescription['dataWebGL'] = {title: 'WebGL Globe', desc: '定义：通过WebGL Globe展示iServer数据', oper: '该范例通过第三方三维球WebGL Globe展示iServer查询返回的数据，数据格式简单转换成WebGL Globe要求的数据格式,该范例在Chrome浏览器展示最佳，注意IE浏览器暂不支持WebGL以及要在发布状态下访问。' }
 DemoDescription['setlayerstatus'] = {title: '子图层控制', desc: '定义：子图层控制', oper: '子图层可见性控制功能一般与获取图层信息的功能联合使用。首先获取地图图层可见性状态，然后创建地图的服务端临时图层，在生成的临时图层中控制子图层的可见性状态，最后将临时图层的newResourceID值赋给创建的TiledDynamicRESTLayer图层，将临时图层显示出来，即完成图层新状态的设置。' }
+DemoDescription['layerGroup'] = {title: '图层组控制', desc: '定义：图层组控制', oper: '图层组是子图层中的一种特殊情况，即子图层中包含了图层组，方便用户可以一次控制多个子图层的显示和隐藏。（注：范例中使用了zTree控件，API详见：http://www.ztree.me/v3/api.php）' }
 DemoDescription['tokenCredential'] = {title: '安全认证范例', desc: '定义：安全认证范例，通过token来控制地图可见。', oper: '1、开启iServer安全认证，并对特定地图服务实例进行权限控制；2、将地图服务实例与对应token输入文本框；3、单击确定即可；注意：该范例应该使用分块动态 REST 图层。' }
 DemoDescription['d3_windmap'] = {title: '风向图', desc: '定义：风向图，模拟中国冬季季风。基于d3js实现。', oper: '无' }
 DemoDescription['polling'] = {title: '轮询范例', desc: '定义：通过对不同服务器进行轮询，从而获得来自多个不同的服务器的地图服务，加速出图速度', oper: '在输入框中输入地图服务器地址，点击+号即可添加一个url，可以反复添加多个。' }

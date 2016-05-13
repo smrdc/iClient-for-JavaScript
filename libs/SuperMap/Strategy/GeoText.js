@@ -235,6 +235,25 @@ SuperMap.Strategy.GeoText = SuperMap.Class(SuperMap.Strategy, {
     },
 
     /**
+     * Method: clone
+     *
+     * Returns
+     * {<SuperMap.Strategy.GeoText>} GeoText 策略对象
+     */
+    clone: function(){
+        var geoText = new SuperMap.Strategy.GeoText();
+        var style = {};
+        for(var property in this.style){
+            var value = this.style[property];
+            if(value !== undefined){
+                style[property] = value;
+            }
+        }
+        geoText.style = style;
+        return geoText;
+    },
+
+    /**
      * Method: setStyle
      * 设置标签要素的Style
      *

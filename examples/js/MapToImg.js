@@ -11,6 +11,10 @@
             alert("您的浏览器版本太低，请升级。");
             return;
         }
+        if(document.location.toString().match(/file:\/\//)){
+            alert("该功能需要在服务器中发布出来后，方可使用");
+            return;
+        }
         LAYER_COUNT = 0;
 
         var layers = map.layers.concat([]);
@@ -48,7 +52,7 @@
                 }(imgUrls,i))
             }
         }
-    }
+    };
 
     function draw(img,i,imgUrls){
         imgUrls[i] = img;
@@ -73,7 +77,7 @@
             panel.style.top = "0px";
             panel.style.height = "100%";
             panel.style.width = "100%";
-           // panel.style.background = "#e6e8eb";
+            // panel.style.background = "#e6e8eb";
             panel.style.background = "#ffffff";
             document.body.appendChild(panel);
 
@@ -166,10 +170,10 @@
             }
         }
 
-		var imageUrl = canvas.toDataURL("image/png");
-		var img = new Image();
-		img.src = imageUrl;
-		return img;
+        var imageUrl = canvas.toDataURL("image/png");
+        var img = new Image();
+        img.src = imageUrl;
+        return img;
     }
     //截取canvas图层
     function getCanvasLayerData(layer){
@@ -184,18 +188,23 @@
     //截取Vector图层
     function getVectorLayerData(layer,map,callback){
         var printLayer,
-            strategy,
-			features1 = [],
-			features = layer.features,
-			layerStrategies = layer.strategies;
+            strategies = [],
+            features1 = [],
+            features = layer.features,
+            layerStrategies = layer.strategies;
         //GeoText无法截图问题修复
-		if(layerStrategies){ 
-            strategy = new SuperMap.Strategy.GeoText();
-            strategy.style = layerStrategies[0].style;
-			printLayer = new SuperMap.Layer.Vector("PRINT_LAYER", {strategies: [strategy], visibility: true, renderers: ["Canvas"]});
-		}else{
-			printLayer = new SuperMap.Layer.Vector("PRINT_LAYER", {visibility: true, renderers: ["Canvas"]});
-		}	
+        if(layerStrategies){
+            for(var i = 0; i<layerStrategies.length; i++){
+                if (layerStrategies[i].CLASS_NAME === "SuperMap.Strategy.GeoText"){
+                    strategies.push(layerStrategies[i].clone());
+                }else{
+                    strategies.push(layerStrategies[i]);
+                }
+            }
+            printLayer = new SuperMap.Layer.Vector("PRINT_LAYER", {strategies: strategies, visibility: true, renderers: ["Canvas"]});
+        }else{
+            printLayer = new SuperMap.Layer.Vector("PRINT_LAYER", {visibility: true, renderers: ["Canvas"]});
+        }
         map.addLayer(printLayer);
         for(var j=0;j<features.length;j++){
             var feature = features[j];
@@ -208,7 +217,7 @@
         if(layer.style){
             printLayer.style = layer.style;
         }
-		
+
         printLayer.setOpacity(0);
         printLayer.addFeatures(features1);
 
@@ -229,4 +238,4 @@
             }
         }(printLayer,map,callback),30);
     }
-})()
+})();

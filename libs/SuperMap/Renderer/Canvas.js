@@ -51,6 +51,12 @@ SuperMap.Renderer.Canvas = SuperMap.Class(SuperMap.Renderer, {
     pendingRedraw: false,
 
     /**
+     * Property: cachedSymbolBounds
+     * {Object} Internal cache of calculated symbol extents.
+     */
+    cachedSymbolBounds: {},
+
+    /**
      * Property: londingimgs
      * {Object} 处于下载中的图片
      */
@@ -402,6 +408,8 @@ SuperMap.Renderer.Canvas = SuperMap.Class(SuperMap.Renderer, {
         if(style.graphic !== false) {
             if(style.externalGraphic) {
                 this.drawExternalGraphic(geometry, style, featureId);
+            }else if (style.graphicName && (style.graphicName != "circle")) {
+                this.drawNamedSymbol(geometry, style, featureId);
             } else {
                 var pt = this.getLocalXY(geometry);
                 var p0 = pt[0];
@@ -437,6 +445,156 @@ SuperMap.Renderer.Canvas = SuperMap.Class(SuperMap.Renderer, {
                     }
                 }
             }
+        }
+    },
+
+    /**
+     * Method: drawNamedSymbol
+     * 根据符号号来绘制特定的几种符号，是一个私有方法
+     *
+     * Parameters:
+     * geometry - {<SuperMap.Geometry>}
+     * style    - {Object}
+     * featureId - {String}
+     */
+    drawNamedSymbol: function(geometry, style, featureId) {
+        var x, y, cx, cy, i, symbolBounds, scaling, angle;
+        var unscaledStrokeWidth;
+        var deg2rad = Math.PI / 180.0;
+
+        var symbol = SuperMap.Renderer.symbol[style.graphicName];
+
+        if (!symbol) {
+            throw new Error(style.graphicName + ' is not a valid symbol name');
+        }
+
+        if (!symbol.length || symbol.length < 2) return;
+
+        var pt = this.getLocalXY(geometry);
+        var p0 = pt[0];
+        var p1 = pt[1];
+
+        if (isNaN(p0) || isNaN(p1)) return;
+
+        // Use rounded line caps
+        this.canvas.lineCap = "round";
+        this.canvas.lineJoin = "round";
+
+        if (this.hitDetection) {
+            this.hitContext.lineCap = "round";
+            this.hitContext.lineJoin = "round";
+        }
+
+        // Scale and rotate symbols, using precalculated bounds whenever possible.
+        if (style.graphicName in this.cachedSymbolBounds) {
+            symbolBounds = this.cachedSymbolBounds[style.graphicName];
+        } else {
+            symbolBounds = new SuperMap.Bounds();
+            if(style.graphicName === 'sector'){
+
+            }else{
+                for(i = 0; i < symbol.length; i+=2) {
+                    symbolBounds.extend(new SuperMap.LonLat(symbol[i], symbol[i+1]));
+                }
+            }
+            this.cachedSymbolBounds[style.graphicName] = symbolBounds;
+        }
+
+        // Push symbol scaling, translation and rotation onto the transformation stack in reverse order.
+        // Don't forget to apply all canvas transformations to the hitContext canvas as well(!)
+        this.canvas.save();
+        if (this.hitDetection) { this.hitContext.save(); }
+
+        // Step 3: place symbol at the desired location
+        this.canvas.translate(p0,p1);
+        if (this.hitDetection) { this.hitContext.translate(p0,p1); }
+
+        // Step 2a. rotate the symbol if necessary
+        angle = deg2rad * style.rotation; // will be NaN when style.rotation is undefined.
+        if (!isNaN(angle)) {
+            this.canvas.rotate(angle);
+            if (this.hitDetection) { this.hitContext.rotate(angle); }
+        }
+
+        // // Step 2: scale symbol such that pointRadius equals half the maximum symbol dimension.
+        scaling = 2.0 * style.pointRadius / Math.max(symbolBounds.getWidth(), symbolBounds.getHeight());
+        if(style.graphicName === 'sector'){
+            scaling = style.pointRadius / 10;
+        }
+        this.canvas.scale(scaling,scaling);
+        if (this.hitDetection) { this.hitContext.scale(scaling,scaling); }
+
+        // Step 1: center the symbol at the origin
+        cx = symbolBounds.getCenterLonLat().lon;
+        cy = symbolBounds.getCenterLonLat().lat;
+        if(style.graphicName !== 'sector'){
+            this.canvas.translate(-cx,-cy);
+        }
+        if (this.hitDetection && style.graphicName !== 'sector') { this.hitContext.translate(-cx,-cy); }
+
+        // Don't forget to scale stroke widths, because they are affected by canvas scale transformations as well(!)
+        // Alternative: scale symbol coordinates manually, so stroke width scaling is not needed anymore.
+        unscaledStrokeWidth = style.strokeWidth;
+        style.strokeWidth = unscaledStrokeWidth / scaling;
+
+        if (style.fill !== false) {
+            this.setCanvasStyle("fill", style);
+            this.canvas.beginPath();
+            for (i=0; i<symbol.length; i=i+2) {
+                x = symbol[i];
+                y = symbol[i+1];
+                if (i == 0) this.canvas.moveTo(x,y);
+                this.canvas.lineTo(x,y);
+            }
+            this.canvas.closePath();
+            this.canvas.fill();
+
+            if (this.hitDetection) {
+                this.setHitContextStyle("fill", featureId, style);
+                this.hitContext.beginPath();
+                for (i=0; i<symbol.length; i=i+2) {
+                    x = symbol[i];
+                    y = symbol[i+1];
+                    if (i == 0) this.canvas.moveTo(x,y);
+                    this.hitContext.lineTo(x,y);
+                }
+                this.hitContext.closePath();
+                this.hitContext.fill();
+            }
+        }
+
+        if (style.stroke !== false) {
+            this.setCanvasStyle("stroke", style);
+            this.canvas.beginPath();
+            for (i=0; i<symbol.length; i=i+2) {
+                x = symbol[i];
+                y = symbol[i+1];
+                if (i == 0) this.canvas.moveTo(x,y);
+                this.canvas.lineTo(x,y);
+            }
+            this.canvas.closePath();
+            this.canvas.stroke();
+
+
+            if (this.hitDetection) {
+                this.setHitContextStyle("stroke", featureId, style);
+                this.hitContext.beginPath();
+                for (i=0; i<symbol.length; i=i+2) {
+                    x = symbol[i];
+                    y = symbol[i+1];
+                    if (i == 0) this.canvas.moveTo(x,y);
+                    this.hitContext.lineTo(x,y);
+                }
+                this.hitContext.closePath();
+                this.hitContext.stroke();
+            }
+
+        }
+
+        style.strokeWidth = unscaledStrokeWidth;
+        this.canvas.restore();
+        if (this.hitDetection) {
+            this.hitContext.restore();
         }
     },
     
@@ -740,15 +898,13 @@ SuperMap.Renderer.Canvas = SuperMap.Class(SuperMap.Renderer, {
 
     /**
      * Method: getFeatureIdFromEvent
-     * Returns a feature id from an event on the renderer.  
-     * 
+     * 返回通过事件获取的要素。
+     *
      * Parameters:
-     * evt - {<SuperMap.Event>} 
+     * evt - {<SuperMap.Event>}
      *
      * Returns:
-     * {<SuperMap.Feature.Vector} A feature or null.  This method returns a 
-     *     feature instead of a feature id to avoid an unnecessary lookup on the
-     *     layer.
+     * {<SuperMap.Feature.Vector} feature 或者 null.  直接返回要素，以避免从图层上再次查询此feature。.
      */
     getFeatureIdFromEvent: function(evt) {
         var feature = null;
@@ -762,7 +918,8 @@ SuperMap.Renderer.Canvas = SuperMap.Class(SuperMap.Renderer, {
                 if (data[3] === 255) { // antialiased
                     var id = data[2] + (256 * (data[1] + (256 * data[0])));
                     if (id) {
-                        feature = this.features["SuperMap.Feature.Vector_" + (id - 1 + this.hitOverflow)][0];
+                        var featureInfo = this.features["SuperMap.Feature.Vector_" + (id - 1 + this.hitOverflow)];
+                        feature = featureInfo && featureInfo[0];
                     }
                 }
             }

@@ -194,6 +194,12 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
       * {Object} styles 样式。(样式里面的label如果没有设置则保留feature自身的label)
       */
     selectStyle: null,
+
+    /**
+     * APIProperty: allowSelectTheSameFeature
+     * 允许多次点击同一要素，默认为false
+     */
+    allowSelectTheSameFeature:false,
     
      /**
       * Property: renderIntent
@@ -249,18 +255,16 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
         this.initLayer(layers);
         var callbacks = {
             click: this.clickFeature,
-            clickout: this.clickoutFeature
+            clickout: this.clickoutFeature,
+            over: this.overFeature,
+            out: this.outFeature
         };
-        if (this.hover) {
-            callbacks.over = this.overFeature;
-            callbacks.out = this.outFeature;
-        }
              
         this.callbacks = SuperMap.Util.extend(callbacks, this.callbacks);
         this.handlers = {
             feature: new SuperMap.Handler.Feature(
                 this, this.layer, this.callbacks,
-                {geometryTypes: this.geometryTypes}
+                {geometryTypes: this.geometryTypes,allowClickTwice:this.allowSelectTheSameFeature}
             )
         };
 
@@ -381,7 +385,7 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
       * Parameters:
       * feature - {<SuperMap.Feature.Vector>} 
       */
-    clickFeature: function(feature) {
+    clickFeature: function(feature, evt) {
         if(!this.hover) {
             var selected = (SuperMap.Util.indexOf(
                 feature.layer.selectedFeatures, feature) > -1);
@@ -391,14 +395,14 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
                 } else if(!this.multipleSelect()) {
                     this.unselectAll({except: feature});
                     if(this.repeat){
-                             this.onSelect.call(this.scope, feature);
+                             this.onSelect.call(this.scope, feature, evt);
                     }
                 }
             } else {
                 if(!this.multipleSelect()) {
                     this.unselectAll({except: feature});
                 }
-                this.select(feature);
+                this.select(feature, evt);
             }
         }
     },
@@ -451,15 +455,17 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
       * Parameters:
       * feature - {<SuperMap.Feature.Vector>} 
       */
-    overFeature: function(feature) {
+    overFeature: function(feature, evt) {
         var layer = feature.layer;
         if(this.hover) {
             if(this.highlightOnly) {
                 this.highlight(feature);
             } else if(SuperMap.Util.indexOf(
                 layer.selectedFeatures, feature) === -1) {
-                this.select(feature);
+                this.select(feature, evt);
             }
+        }else{
+            this.layer.div.style.cursor="pointer";
         }
     },
 
@@ -496,6 +502,8 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
             } else {
                 this.unselect(feature);
             }
+        }else{
+            this.layer.div.style.cursor= null;
         }
     },
 
@@ -578,7 +586,7 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
       * Parameters:
       * feature - {<SuperMap.Feature.Vector>} 
       */
-    select: function(feature) {
+    select: function(feature, evt) {
         var cont = this.onBeforeSelect.call(this.scope, feature);
         var layer = feature.layer;
         if(cont !== false) {
@@ -595,8 +603,8 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
                 if(!this.handlers.feature.lastFeature) {
                     this.handlers.feature.lastFeature = layer.selectedFeatures[0];
                 }
-                layer.events.triggerEvent("featureselected", {feature: feature});
-                this.onSelect.call(this.scope, feature);
+                layer.events.triggerEvent("featureselected", {feature: feature, evt:evt});
+                this.onSelect.call(this.scope, feature, evt);
             }
         }
     },

@@ -273,7 +273,7 @@ SuperMap.Layer = SuperMap.Class({
 
     /**
      * APIProperty: wrapDateLine
-     * {Boolean}  当地图平移到日期变更线外边后是否仍然继续循环显示地图。当为false时不显示，默认为false
+     * {Boolean}  在底图图层的最大范围等于世界范围情况时，当底图图层平移到日期变更线外边后是否仍然继续循环显示。当为false时不显示，默认为false
      */
     wrapDateLine: false,
 
@@ -1272,15 +1272,15 @@ SuperMap.Layer = SuperMap.Class({
         if (opacity !== this.opacity) {
             this.opacity = opacity;
             //区分canvas图层和普通瓦片img图层对待
-            //if(this.useCanvas){
-            //    this.redraw();
-            //}else{
+            if(this.useCanvas){
+                this.redraw();
+            }else{
                 for(var i=0, len=this.div.childNodes.length; i<len; ++i) {
                     var element = this.div.childNodes[i].firstChild || this.div.childNodes[i] ;  // 添加 || this.div.childNodes[i] 考虑 this.div.childNodes[i].firstChild 不存在情况
                     SuperMap.Util.modifyDOMElement(element, null, null, null, 
                                                  null, null, null, opacity);
                 }
-            //}
+            }
             
             if (this.map != null) {
                 this.map.events.triggerEvent("changelayer", {

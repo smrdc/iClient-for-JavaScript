@@ -1038,7 +1038,7 @@ SuperMap.Layer.Vector = SuperMap.Class(SuperMap.Layer, {
         else
         {
             drawn = this.renderer.drawFeature(feature, style, option);
-            this.renderer.container.style.cursor="pointer";
+            //this.renderer.container.style.cursor="pointer";
         }
 
 

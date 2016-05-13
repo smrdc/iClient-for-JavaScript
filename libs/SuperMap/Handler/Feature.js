@@ -69,6 +69,12 @@ SuperMap.Handler.Feature = SuperMap.Class(SuperMap.Handler, {
     clickTolerance: 4,
 
     /**
+     * Property: allowClickTwice
+     * 在第二次点击同一要素的时候也会触发点击事件，默认为不触发
+     * */
+    allowClickTwice:false,
+
+    /**
      * Property: geometryTypes
      * To restrict dragging to a limited set of geometry types, send a list
      * of strings corresponding to the geometry class names.
@@ -171,10 +177,10 @@ SuperMap.Handler.Feature = SuperMap.Class(SuperMap.Handler, {
      * evt - {Event} 
      */
     mousedown: function(evt) {
-        //if (SuperMap.Event.isLeftClick(evt) || SuperMap.Event.isSingleTouch(evt)) {
-        //	this.down = evt.xy;
-        //}
-        //return this.handle(evt) ? !this.stopDown : true;    
+        if (SuperMap.Event.isLeftClick(evt) || SuperMap.Event.isSingleTouch(evt)) {
+        	this.down = evt.xy;
+        }
+        return this.handle(evt) ? !this.stopDown : true;
     },
     
     /**
@@ -307,17 +313,18 @@ SuperMap.Handler.Feature = SuperMap.Class(SuperMap.Handler, {
                 SuperMap.Event.stop(evt);
             }
             var inNew = (this.feature !== this.lastFeature);
+            inNew = this.allowClickTwice ? true: inNew;
             if(this.geometryTypeMatches(this.feature)) {
                 // in to a feature
                 if(previouslyIn && inNew) {
                     // out of last feature and in to another
                     if(this.lastFeature) {
-                        this.triggerCallback(type, 'out', [this.lastFeature]);
+                        this.triggerCallback(type, 'out', [this.lastFeature, evt]);
                     }
-                    this.triggerCallback(type, 'in', [this.feature]);
+                    this.triggerCallback(type, 'in', [this.feature, evt]);
                 } else if(!previouslyIn || click) {
                     // in feature for the first time
-                    this.triggerCallback(type, 'in', [this.feature]);
+                    this.triggerCallback(type, 'in', [this.feature, evt]);
                 }
                 this.lastFeature = this.feature;
                 handled = true;
@@ -325,7 +332,7 @@ SuperMap.Handler.Feature = SuperMap.Class(SuperMap.Handler, {
                 // not in to a feature
                 if(this.lastFeature && (previouslyIn && inNew || click)) {
                     // out of last feature for the first time
-                    this.triggerCallback(type, 'out', [this.lastFeature]);
+                    this.triggerCallback(type, 'out', [this.lastFeature, evt]);
                 }
                 // next time the mouse goes in a feature whose geometry type
                 // doesn't match we don't want to call the 'out' callback
@@ -336,7 +343,7 @@ SuperMap.Handler.Feature = SuperMap.Class(SuperMap.Handler, {
             }
         } else {
             if(this.lastFeature && (previouslyIn || click)) {
-                this.triggerCallback(type, 'out', [this.lastFeature]);
+                this.triggerCallback(type, 'out', [this.lastFeature, evt]);
             }
         }
         return handled;

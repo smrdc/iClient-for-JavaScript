@@ -2,8 +2,6 @@
     z-index: 0;
     padding: 0px!important;
     margin: 0px!important;
-//  cursor: default;
-    cursor: url("../images/cursors/Pan.cur"),default;
     border:1px solid #3473b7;
 }
 
