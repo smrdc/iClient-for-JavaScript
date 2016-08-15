@@ -418,7 +418,7 @@ test("testCollection_transform",function(){
     var source = new SuperMap.Projection("EPSG:4326");
     var dest = new SuperMap.Projection("EPSG:900913");
     var transform = col.transform(source,dest);
-    equal(transform.components[0].x,1113194.9077777779,"Function:transform");
+    equal(transform.components[0].x,1113194.9077777778,"Function:transform");
     equal(transform.components[0].y,2273030.9266712805,"Function:transform");
     equal(transform.components[1].x,3339584.7233333336,"Function:transform");
     equal(transform.components[1].y,4865942.278825832,"Function:transform");

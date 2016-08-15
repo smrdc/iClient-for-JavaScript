@@ -191,6 +191,94 @@ SuperMap.Renderer.Canvas = SuperMap.Class(SuperMap.Renderer, {
     },
 
     /** 
+	     * Method: copyCellStyle
+	     * Copy featureStyle to CellStyle.
+	     *
+	     * Parameters:
+	     * cellStyle - {Object}
+	     * featureStyle - {Object}
+	     * geometry - {<SuperMap.Geometry.GeoGraphicObject>}
+	     */
+    copyCellStyle: function(cellStyle, featureStyle, geometry){
+        function colorRGBA(color, alpha){
+            var hexStringR = color.substring(1, 3);
+            var red = parseInt(hexStringR, 16);
+            var hexStringG = color.substring(3, 5);
+            var green = parseInt(hexStringG, 16);
+            var hexStringB = color.substring(5);
+            var blue = parseInt(hexStringB, 16);
+
+            return "rgba(" + red + "," + green +"," + blue + "," + alpha + ")";
+        }
+
+        if(cellStyle.surroundLineFlag){
+            if(geometry.surroundLineType === SuperMap.Plot.AlgoSurroundLineType.ALL){
+                cellStyle.strokeWidth = featureStyle.surroundLineWidth*2 + featureStyle.strokeWidth;
+            } else {
+                cellStyle.strokeWidth = featureStyle.surroundLineWidth;
+            }
+            cellStyle.strokeColor = featureStyle.surroundLineColor;
+            cellStyle.strokeOpacity = featureStyle.surroundLineColorOpacity;
+        } else {
+            if(!cellStyle.lineWidthLimit){
+                cellStyle.strokeWidth = featureStyle.strokeWidth;
+            }
+            if(!cellStyle.lineColorLimit){
+                cellStyle.strokeColor = featureStyle.strokeColor;
+                cellStyle.strokeOpacity = featureStyle.strokeOpacity;
+            }
+            if(!cellStyle.lineTypeLimit){
+                cellStyle.strokeDashstyle = featureStyle.strokeDashstyle;
+            }
+        }
+
+        if(!cellStyle.fillLimit){
+            if(cellStyle.fillColor instanceof SuperMap.Style.Gradient){
+                cellStyle.fillColor.destroy();
+                cellStyle.fillColor = null;
+            }
+
+            if(featureStyle.fillGradientMode === "LINEAR" || featureStyle.fillGradientMode === "RADIAL"){
+                var bounds = geometry.getBounds();
+                var pt1 = this.getLocalXY(new SuperMap.Geometry.Point(bounds.left, bounds.top));
+                var pt2 = this.getLocalXY(new SuperMap.Geometry.Point(bounds.right, bounds.bottom));
+                var ptCenter = this.getLocalXY(new SuperMap.Geometry.Point((bounds.left+bounds.right)/2, (bounds.top+bounds.bottom)/2));
+                var dRadius = Math.abs(pt1[0]-pt2[0]) > Math.abs(pt1[1]-pt2[1]) ? Math.abs(pt1[0]-pt2[0]) : Math.abs(pt1[1]-pt2[1]);
+                cellStyle.fill = true;
+
+                if(featureStyle.fillGradientMode === "LINEAR"){
+                    cellStyle.fillColor = this.canvas.createLinearGradient(pt1[0], pt1[1], pt2[0], pt1[1]);
+                } else if(featureStyle.fillGradientMode === "RADIAL"){
+                    cellStyle.fillColor = this.canvas.createRadialGradient(ptCenter[0], ptCenter[1], 0, ptCenter[0], ptCenter[1], dRadius);
+                }
+
+                cellStyle.fillColor.addColorStop(0, colorRGBA(featureStyle.fillColor, featureStyle.fillOpacity));
+                cellStyle.fillColor.addColorStop(1, colorRGBA(featureStyle.fillBackColor, featureStyle.fillBackOpacity));
+            } else {
+                cellStyle.fill = featureStyle.fill;
+                cellStyle.fillColor = featureStyle.fillColor;
+                cellStyle.fillOpacity = featureStyle.fillOpacity;
+            }
+
+        } else if(geometry.symbolType === 1 && cellStyle.fillLimit){
+            if(!cellStyle.fillColorLimit ){
+                cellStyle.fillColor = featureStyle.strokeColor;
+                cellStyle.fillOpacity = featureStyle.strokeOpacity;
+            }
+        }
+
+        if(!cellStyle.fontSizeLimit || cellStyle.fontSizeLimit === false){
+            cellStyle.fontSize = featureStyle.fontSize;
+        }
+        if(!cellStyle.fontColorLimit || cellStyle.fontColorLimit === false){
+            cellStyle.fontColor = featureStyle.fontColor;
+        }
+
+        if(featureStyle.display){
+            cellStyle.display = featureStyle.display;
+        }
+    },
+	/**
      * Method: drawGeometry
      * Used when looping (in redraw) over the features; draws
      * the canvas. 
@@ -200,14 +288,55 @@ SuperMap.Renderer.Canvas = SuperMap.Class(SuperMap.Renderer, {
      * style - {Object} 
      */
     drawGeometry: function(geometry, style, featureId) {
+ function reDrawSurroundLine(geometry, featureStyle){
+            var reDrawSurroundLineFlag = false;
+
+            if(geometry.symbolType !== SuperMap.Plot.SymbolType.DOTSYMBOL && (geometry.surroundLineType === SuperMap.Plot.AlgoSurroundLineType.INNER || geometry.surroundLineType === SuperMap.Plot.AlgoSurroundLineType.OUT)){
+                for(var i = 0; i < geometry.components.length; i++){
+                    if(geometry.components[i].style.surroundLineFlag && featureStyle.surroundLineWidth !== geometry.components[i].style.strokeWidth){
+                        reDrawSurroundLineFlag = true;
+                    } else if(!geometry.components[i].style.surroundLineFlag && featureStyle.strokeWidth !== geometry.components[i].style.strokeWidth){
+                        reDrawSurroundLineFlag = true;
+                    }
+                }
+            }
+
+            if(reDrawSurroundLineFlag){
+                geometry.dOffset = featureStyle.surroundLineWidth/2.0 + featureStyle.strokeWidth/2.0;
+
+                for(var j = 0; j < geometry.components.length; j++) {
+                    if(geometry.components[j].style.surroundLineFlag && geometry.components[j].originSymbolCell && geometry.components[j].originSymbolCell !== null){
+                        geometry.components[j] = geometry.handleSurroundLine(geometry.components[j].originSymbolCell);
+                    }
+                }
+            }
+        }
         var className = geometry.CLASS_NAME;
         if ((className === "SuperMap.Geometry.Collection") ||
             (className === "SuperMap.Geometry.MultiPoint") ||
             (className === "SuperMap.Geometry.MultiLineString") ||
+			(className === "SuperMap.Geometry.GeoGraphicObject.DotSymbol") ||
+			(className === "SuperMap.Geometry.GeoGraphicObject.AlgoSymbol") ||
             (className === "SuperMap.Geometry.MultiPolygon")||
             (className === "SuperMap.REST.Route")) {
             for (var i = 0; i < geometry.components.length; i++) {
-                this.drawGeometry(geometry.components[i], style, featureId);
+				if((className === "SuperMap.Geometry.GeoGraphicObject.DotSymbol") ||
+                    (className === "SuperMap.Geometry.GeoGraphicObject.AlgoSymbol")){
+                    reDrawSurroundLine(geometry, style);
+                    this.copyCellStyle(geometry.components[i].style, style, geometry);
+
+                    if(geometry.components[i].CLASS_NAME === "SuperMap.Geometry.GeoText"){
+                        //featureId, style, location
+                        var location = new SuperMap.Geometry.Point(geometry.components[i].x, geometry.components[i].y);
+                        geometry.components[i].style.label = geometry.components[i].text.toString();
+                        this.drawText(location,geometry.components[i].style);
+                    }
+                    else{
+                        this.drawGeometry(geometry.components[i], geometry.components[i].style, featureId);
+                    }
+                } else {
+                    this.drawGeometry(geometry.components[i], style, featureId);
+                }
             }
             return;
         }
@@ -335,8 +464,13 @@ SuperMap.Renderer.Canvas = SuperMap.Class(SuperMap.Renderer, {
      */
     setCanvasStyle: function(type, style) {
         if (type === "fill") {     
-            this.canvas.globalAlpha = style['fillOpacity'];
-            this.canvas.fillStyle = style['fillColor'];
+			if(style.fillColor instanceof CanvasGradient){
+                this.canvas.globalAlpha = 1;
+                this.canvas.fillStyle = style['fillColor'];
+            } else {
+                this.canvas.globalAlpha = style['fillOpacity'];
+                this.canvas.fillStyle = style['fillColor'];
+            }
         } else if (type === "stroke") {  
             this.canvas.globalAlpha = style['strokeOpacity'];
             this.canvas.lineCap = style['strokeLinecap'];

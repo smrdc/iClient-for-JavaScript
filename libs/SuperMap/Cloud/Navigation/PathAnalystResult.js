@@ -22,6 +22,12 @@ SuperMap.Cloud.PathAnalystResult = SuperMap.Class({
      * {Array(<SuperMap.Cloud.PathInfo>)} 路径导航分析结果中的导航引导信息集合。
      */
 	pathInfos:null,
+
+    /**
+     * APIProperty: pathTime
+     * {Number} 导航花费时间。单位：秒。
+     */
+    pathTime: null,
 	
 	/**
      * Constructor: SuperMap.Cloud.PathAnalystResult
@@ -49,6 +55,7 @@ SuperMap.Cloud.PathAnalystResult = SuperMap.Class({
         me.pathLength = null;
         me.pathPoints = null;
         me.pathInfos = null;
+        me.pathTime = null;
     },
     
     CLASS_NAME: "SuperMap.Cloud.PathAnalystResult"
@@ -85,6 +92,7 @@ SuperMap.Cloud.PathAnalystResult.fromJson = function(jsonObject) {
     return new SuperMap.Cloud.PathAnalystResult({
         pathPoints: pathPoints,
         pathInfos: pathInfos,
-        pathLength: jsonObject.pathLength
+        pathLength: jsonObject.pathLength,
+        pathTime: jsonObject.pathTime
     });
 };

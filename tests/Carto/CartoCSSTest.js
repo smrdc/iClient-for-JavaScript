@@ -25,6 +25,22 @@ test("testCartoCSS_getShaders",function(){
     cartoCss.destroy();
 });
 
+test("testCartoCSS_getShaders_attribute",function(){
+    var cartoCssStr="#a{line-width:3;[id=1]{line-width:1}[id=2]{line-width:2}}";
+    var cartoCss=new SuperMap.CartoCSS(cartoCssStr);
+    var ruleSets=cartoCss.parse(cartoCssStr);
+    equals(ruleSets.rules.length,1,"Method:parse");
+    var shaders=cartoCss.toShaders();
+    equals(shaders.length,3,"Method:toShaders");
+    equals(shaders[0][0].property,'line-width',"Property:property_1");
+    equals(shaders[0][0].getValue(),3,"Method:getValue_1");
+    equals(shaders[1][0].property,'line-width',"Property:property_2");
+    equals(shaders[1][0].getValue({id:1}),1,"Method:getValue_2");
+    equals(shaders[2][0].property,'line-width',"Property:property_3");
+    equals(shaders[2][0].getValue({id:2}),2,"Method:getValue_3");
+    cartoCss.destroy();
+});
+
 test("testCartoCSS_destructor",function(){
     var cartoCss=new SuperMap.CartoCSS();
     cartoCss.destroy();

@@ -742,46 +742,47 @@ SuperMap.Layer.Vector = SuperMap.Class(SuperMap.Layer, {
             this.renderer.root.style.display = currentDisplay;
         }
     },
-    /**
-     * APIMethod: setOpacity
-     * 设置图层的不透明度,取值[0-1]之间。使用方法如：
-     * 
-     * (code)
-     * var vectorLayer = new SuperMap.Layer.Vector("Vector Layer");
-     * vectorLayer.setOpacity(0.2);
-     * (end)
-     * 
-     * Parameter:
-     * opacity - {Float} 图层的不透明度，取值范围：[0-1]。
-     */
-    setOpacity: function(opacity) {
-        if (opacity !== this.opacity) {
-            this.opacity = opacity;
-            var element = this.renderer.root;
-            SuperMap.Util.modifyDOMElement(element, null, null, null, 
-                                                 null, null, null, opacity);
-            // 区分canvas图层和普通瓦片img图层对待
-            // if(this.useCanvas){
-            //     this.redraw();
-            // }else{
-            //     var element = this.renderer.root;
-            //     SuperMap.Util.modifyDOMElement(element, null, null, null, 
-            //                                      null, null, null, opacity);
-            //     for(var i=0, len=this.div.childNodes.length; i<len; ++i) {
-            //         var element = this.div.childNodes[i].firstChild;
-            //         SuperMap.Util.modifyDOMElement(element, null, null, null, 
-            //                                      null, null, null, opacity);
-            //     }
-            // }
-            
-            if (this.map != null) {
-                this.map.events.triggerEvent("changelayer", {
-                    layer: this,
-                    property: "opacity"
-                });
-            }
-        }
-    },
+
+    ///**
+    // * APIMethod: setOpacity
+    // * 设置图层的不透明度,取值[0-1]之间。使用方法如：
+    // *
+    // * (code)
+    // * var vectorLayer = new SuperMap.Layer.Vector("Vector Layer");
+    // * vectorLayer.setOpacity(0.2);
+    // * (end)
+    // *
+    // * Parameter:
+    // * opacity - {Float} 图层的不透明度，取值范围：[0-1]。
+    // */
+    //setOpacity: function(opacity) {
+    //    if (opacity !== this.opacity) {
+    //        this.opacity = opacity;
+    //        var element = this.renderer.root;
+    //        SuperMap.Util.modifyDOMElement(element, null, null, null,
+    //                                             null, null, null, opacity);
+    //        // 区分canvas图层和普通瓦片img图层对待
+    //        // if(this.useCanvas){
+    //        //     this.redraw();
+    //        // }else{
+    //        //     var element = this.renderer.root;
+    //        //     SuperMap.Util.modifyDOMElement(element, null, null, null,
+    //        //                                      null, null, null, opacity);
+    //        //     for(var i=0, len=this.div.childNodes.length; i<len; ++i) {
+    //        //         var element = this.div.childNodes[i].firstChild;
+    //        //         SuperMap.Util.modifyDOMElement(element, null, null, null,
+    //        //                                      null, null, null, opacity);
+    //        //     }
+    //        // }
+    //
+    //        if (this.map != null) {
+    //            this.map.events.triggerEvent("changelayer", {
+    //                layer: this,
+    //                property: "opacity"
+    //            });
+    //        }
+    //    }
+    //},
     
     /**
      * APIMethod: addFeatures
@@ -1001,6 +1002,8 @@ SuperMap.Layer.Vector = SuperMap.Class(SuperMap.Layer, {
                     if ((geo.CLASS_NAME === "SuperMap.Geometry.Collection") ||
                         (geo.CLASS_NAME === "SuperMap.Geometry.MultiPoint") ||
                         (geo.CLASS_NAME === "SuperMap.Geometry.MultiLineString") ||
+						(geo.CLASS_NAME === "SuperMap.Geometry.GeoGraphicObject.DotSymbol") ||
+						(geo.CLASS_NAME === "SuperMap.Geometry.GeoGraphicObject.AlgoSymbol") ||
                         (geo.CLASS_NAME === "SuperMap.Geometry.MultiPolygon") || geo.isMultiPlotting) {
                         for (var i = 0, len = geo.components.length; i < len; i++) {
                             var id = geo.components[i].id;
@@ -1040,10 +1043,6 @@ SuperMap.Layer.Vector = SuperMap.Class(SuperMap.Layer, {
             drawn = this.renderer.drawFeature(feature, style, option);
             //this.renderer.container.style.cursor="pointer";
         }
-
-
-
-
 
         // TODO remove the check for null when we get rid of Renderer.SVG
         if (drawn === false || drawn === null) {

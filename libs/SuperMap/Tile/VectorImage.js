@@ -473,13 +473,20 @@ SuperMap.Tile.VectorImage = SuperMap.Class(SuperMap.Tile, {
          * recordSets - {Array} 从服务端返回的矢量分块数据集
          * */
         recordSetToCartoLayer:function(recordSets){
+            var renderer=this.layer&&this.layer.cartoRenderer;
             for(var i= 0,len=recordSets.length;i<len;i++){
                 var recordSet=recordSets[i];
                 var serverFeatures=recordSet.features;
                 var layerName=recordSet.layerName;
                 var layerInfo=this.getLayerInfo(layerName);
                 //一个数据集对应一个Carto图层
-                var cartoLayer=new SuperMap.CartoLayer(layerName,this,{originIndex:i,ugcLayerType:layerInfo.ugcLayerType});
+                var cartoLayer=new SuperMap.CartoLayer(layerName,this,{
+                    layer:this.layer,
+                    originIndex:i,
+                    ugcLayerType:layerInfo.ugcLayerType,
+                    context:this.context,
+                    hitContext:this.hitContext,
+                    cartoRenderer:renderer});
                 cartoLayer.addFeatures(serverFeatures);
                 this.setCartoLayerShaderer(cartoLayer,layerInfo.layerStyle);
                 this.addCartoLayer(cartoLayer);
@@ -499,18 +506,18 @@ SuperMap.Tile.VectorImage = SuperMap.Class(SuperMap.Tile, {
             if(!layerStyle){
                 layerStyle=this.getLayerInfo(cartoLayer.layerName).layerStyle;
             }
-            var picked=this.pickShader(cartoLayer);
-            if(!picked&&layerStyle){
-                var renderer=this.layer&&this.layer.cartoRenderer;
-                var symbol=new SuperMap.CartoSymbolizer(cartoLayer,null,{style:layerStyle},
-                    {
-                        layer:this.layer,
-                        context:this.context,
-                        hitContext:this.hitContext,
-                        cartoRenderer:renderer
-                    });
-                cartoLayer.addSymbolizer(symbol);
-            }
+            var renderer=this.layer&&this.layer.cartoRenderer;
+            var symbol=new SuperMap.CartoSymbolizer(cartoLayer,null,null,
+                {
+                    shader: layerStyle,
+                    useLayerInfo: true,
+                    layer:this.layer,
+                    context:this.context,
+                    hitContext:this.hitContext,
+                    cartoRenderer:renderer
+                });
+            cartoLayer.addSymbolizer(symbol);
+            this.pickShader(cartoLayer);
         },
 
         /**
@@ -522,11 +529,13 @@ SuperMap.Tile.VectorImage = SuperMap.Class(SuperMap.Tile, {
         pickShader:function(cartoLayer){
             if(!this.layer||!this.layer.cartoShaders)return false;
             var shaders=this.layer.cartoShaders;
+            var fromServer = this.layer.cartoShaders.fromServer;
             var renderer=this.layer&&this.layer.cartoRenderer;
             var picked=false;
             var isPC=SuperMap.Browser.device==="pc";
             for(var i= 0,len=shaders.length;i<len;i++){
                 var shader=shaders[i];
+                shader.fromServer = fromServer;
                 if(shader.length<1&&!shader.layerIndex)continue;
                 var checked=check(cartoLayer,shader.elements);
                 if(checked){
@@ -539,14 +548,16 @@ SuperMap.Tile.VectorImage = SuperMap.Class(SuperMap.Tile, {
                         continue;
                     }
                     if(shader.length>=1){
-                        var symbol=new SuperMap.CartoSymbolizer(cartoLayer,null,{shader:shader},
+                        var symbol=new SuperMap.CartoSymbolizer(cartoLayer,null,null,
                             {
+                                shader:shader,
+                                useLayerInfo:false,
                                 layer:this.layer,
                                 context:this.context,
                                 hitContext:this.hitContext,
                                 cartoRenderer:renderer
                             });
-                        cartoLayer.addSymbolizer(symbol);
+                        cartoLayer.addSymbolizer(symbol,shader.attachment);
                     }
                     if(shader.layerIndex||shader.layerIndex==0){         //shader.layerIndex为0时会被跳过，所以要把0的情况考虑上
                         cartoLayer.setIndex(shader.layerIndex);
@@ -652,11 +663,12 @@ SuperMap.Tile.VectorImage = SuperMap.Class(SuperMap.Tile, {
             var layerInfo_simple={layerIndex:layerInfo.layerIndex,ugcLayerType:layerInfo.ugcLayerType};
             switch(layerInfo.ugcLayerType){
                 case "VECTOR":
+                case "THEME":
                     layerInfo_simple.layerStyle=layerInfo.style;
                     break;
-                case "THEME":
+/*
                     layerInfo_simple.layerStyle=(layerInfo.theme&&layerInfo.theme.defaultStyle);
-                    break;
+                    break;*/
                 default :
                     //SVTile发布出来的地图没有ugcLayerType属性
                     if(layerInfo.style){

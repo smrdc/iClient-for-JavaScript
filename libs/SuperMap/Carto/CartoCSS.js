@@ -3693,13 +3693,16 @@ SuperMap.CartoCSS.Tree.Filterset=SuperMap.Class({
         function eachFilter(filter) {
             var op = filter.op;
             if(op === "=") {
-                op = "===";
+                op = "==";
             }
             var val = filter.val;
             if(filter._val !== undefined) {
                 val = filter._val.toString(true);
             }
 
+            if(typeof val === 'string' || typeof val === 'object'){
+                val = "'"+ val + "'";
+            }
             var attrs = "attributes";
             return attrs + "&&" +attrs + filter.key  + "&&" +attrs + filter.key  +" " + op  + val;
         };

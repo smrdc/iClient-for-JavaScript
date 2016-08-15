@@ -297,7 +297,7 @@ SuperMap.Geometry.Polygon.createRegularPolygonCurve = function(origin, radius, s
 
     var ring = new SuperMap.Geometry.LinearRing(points);
     ring.rotate(parseFloat(angel),origin);
-    var geo = new SuperMap.Geometry.Collection([ring]);
+    var geo = new SuperMap.Geometry.Polygon([ring]);
     geo.origin = origin;
     geo.radius = radius;
     geo.r = r;

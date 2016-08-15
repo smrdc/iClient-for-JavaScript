@@ -8,11 +8,11 @@
 
 /**
  * Class: SuperMap.Cloud.GeocodingService
- * SQL 查询服务类。
- * 在一个或多个指定的图层上查询符合 SQL 条件的空间地物信息。
+ * 地理编码服务类。
+ * 通过地址信息查询相应的坐标信息。
  * 
  * Inherits from:
- *  - <SuperMap.REST.QueryService> 
+ *  - <SuperMap.REST.ServiceBase>
  */
 SuperMap.Cloud.GeocodingService = SuperMap.Class(SuperMap.ServiceBase, {
     /**
@@ -29,13 +29,13 @@ SuperMap.Cloud.GeocodingService = SuperMap.Class(SuperMap.ServiceBase, {
 
     /**
      * APIProperty: events
-     * {<SuperMap.Events>} 在 GetLayersInfoService 类中处理所有事件的对象，支持两种事件 processCompleted 、processFailed ，服务端成功返回查询结果时触发 processCompleted 事件，服务端返回查询结果失败时触发 processFailed 事件。
+     * {<SuperMap.Events>} 在 GeocodingService 类中处理所有事件的对象，支持两种事件 processCompleted 、processFailed ，服务端成功返回查询结果时触发 processCompleted 事件，服务端返回查询结果失败时触发 processFailed 事件。
      */
     events: null,
 
     /**
      * APIProperty: eventListeners
-     * {Object} 监听器对象，在构造函数中设置此参数（可选），对 PathAnalystService 支持的两个事件 processCompleted 、processFailed 进行监听，相当于调用 SuperMap.Events.on(eventListeners)。
+     * {Object} 监听器对象，在构造函数中设置此参数（可选），对 GeocodingService 支持的两个事件 processCompleted 、processFailed 进行监听，相当于调用 SuperMap.Events.on(eventListeners)。
      */
     eventListeners: null,
 
@@ -47,11 +47,11 @@ SuperMap.Cloud.GeocodingService = SuperMap.Class(SuperMap.ServiceBase, {
 
     /**
      * Constructor: SuperMap.Cloud.GeocodingService
-     * 路径导航分析服务类构造函数。
+     * 地理编码服务类构造函数。
      *
      * Parameters:
      * url - {String} 分析服务提供者地址url。
-     * 如 http://beta.isupermap.com/iserver/services/navigation/rest/navigationanalyst/China/pathanalystresults。
+     * 如 http://www.supermapol.com/iserver/services/location-china/rest/locationanalyst/China/geocoding
      *
      * Allowed options properties:
      * eventListeners - {Object} 需要被注册的监听器对象。
@@ -93,7 +93,7 @@ SuperMap.Cloud.GeocodingService = SuperMap.Class(SuperMap.ServiceBase, {
      * 发送路径导航分析请求到服务端。
      *
      * Parameters:
-     * params - {Array(<SuperMap.Cloud.GeocodingParameter>)} 分析请求参数，由 PathAnalystParameter 对象组成的数组。
+     * params - {<SuperMap.Cloud.GeocodingParameter>} 分析请求参数，由 GeocodingParameter 对象组成的数组。
      */
     processAsync: function(params) {
         if(!params){
@@ -110,37 +110,42 @@ SuperMap.Cloud.GeocodingService = SuperMap.Class(SuperMap.ServiceBase, {
             method: "GET",
             params:params.toObject(),
             scope: me,
-            success: me.pathAnalystComplete,
-            failure: me.pathAnalystError
+            success: me.GeocodingComplete,
+            failure: me.GeocodingError
         });
 
     },
 
     /**
-     * Method: pathAnalystComplete
-     * 分析成功，执行此方法。
+     * Method: GeocodingComplete
+     * 查询成功，执行此方法。
      *
      * Parameters:
-     * result - {Object} 服务端返回的导航路径分析结果。
+     * result - {Object} 服务端返回的坐标信息结果。
      */
-    pathAnalystComplete: function(result) {
+    GeocodingComplete: function(result) {
         var me = this,
-            geocodingResult;
-        geocodingResult = SuperMap.Util.transformResult(result);
+            geocodingResults = [];
+        result = SuperMap.Util.transformResult(result);
+        if(SuperMap.Util.isArray(result)) {
+            for (var i = 0, len = result.length; i < len; i++) {
+                geocodingResults[i] = SuperMap.Cloud.GeocodingResult.fromJson(result[i]);
 
-        me.lastResult = SuperMap.Cloud.GeocodingResult.fromJson(result);
-        geocodingEvt = new SuperMap.Cloud.GeocodingEventArgs(geocodingResult, result);
+            }
+        }
+        me.lastResult = geocodingResults;
+        geocodingEvt = new SuperMap.Cloud.GeocodingEventArgs(geocodingResults, result);
         me.events.triggerEvent("processCompleted", geocodingEvt);
     },
 
     /**
-     * Method: pathAnalystError
-     * 路径导航分析失败，执行此方法。
+     * Method: GeocodingError
+     * 查询失败，执行此方法。
      *
      * Parameters:
      * result -  {Object} 服务器返回的结果对象。
      */
-    pathAnalystError: function(result) {
+    GeocodingError: function(result) {
         var me = this,
             error = null,
             serviceException = null,

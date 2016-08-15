@@ -1420,7 +1420,7 @@ SuperMap.Control.TiledVectorLayerEditor=SuperMap.Class(SuperMap.Control,{
     layerSymbolsInfo2CartoCss:function(){
         var cartocss="",layerSymbolsInfo=this.layerSymbolsInfo;
         for(var layerName in layerSymbolsInfo){
-            var layerId=layerName.replace(/[@#]/gi,"__"),symbolsInfo=layerSymbolsInfo[layerName];
+            var layerId=layerName.replace(/[@#]/gi,"___"),symbolsInfo=layerSymbolsInfo[layerName];
             var layerSymbols=symbolsInfo.layerSymbols;
             for(var i= 0,len=layerSymbols.length;i<len;i++){
                 var symbol="",count=0;

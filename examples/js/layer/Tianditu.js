@@ -178,7 +178,7 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
      * Parameters:
      * projection - {String} 投影坐标系
      */
-     setTiandituParam:function(projection){
+    setTiandituParam:function(projection){
         var lt = this.layerType;
         if(lt=="vec"){
             var resLen = 17;
@@ -237,7 +237,7 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
             //this.numZoomLevels = 18;
 
             this.units = "m";
-            this.projection = new SuperMap.Projection("EPSG:900913");
+            this.projection = new SuperMap.Projection("EPSG:3857");
 
             this.maxExtent=new SuperMap.Bounds(
                 minX, minY, maxX, maxY

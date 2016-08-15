@@ -75,6 +75,8 @@ SuperMap.Lang["zh-CN"] = {
     'm': "米",
     'ft': "英尺",
 
+    'cloudLayerAttr': '©2014 SuperMap - GS(2014)6070号-data©Navinfo',
+
     //矢量地图编辑器
     'editorName':"矢量地图编辑器",
     'layerList':"图层列表",

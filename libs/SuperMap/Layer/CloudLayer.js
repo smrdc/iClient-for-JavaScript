@@ -27,10 +27,16 @@ SuperMap.Layer.CloudLayer = SuperMap.Class(SuperMap.CanvasLayer, {
     
     /**
      * APIProperty: url
-     * {String} 地图资源地址。默认为：http://t1.supermapcloud.com/FileService/image
+     * {String} 地图资源地址。默认为：http://t2.supermapcloud.com/FileService/image
      */
     url: 'http://t2.supermapcloud.com/FileService/image',
     
+    /**
+     * APIProperty: attribution
+     * {String} 地图属性信息，可显示到地图上。
+     */
+    attribution: null,//'©2014 SuperMap - GS(2014)6070号-data©Navinfo',
+
     /**
      * APIProperty: mapName
      * {String} 地图名称，默认为 quanguo。
@@ -52,6 +58,7 @@ SuperMap.Layer.CloudLayer = SuperMap.Class(SuperMap.CanvasLayer, {
      */
     initialize: function (options) {
         var me = this;
+        this.attribution = SuperMap.i18n("cloudLayerAttr");
         me.url = me.url + '?map=${mapName}&type=${type}&x=${x}&y=${y}&z=${z}';
         //超图云只有一个开放的出图地址，投影为墨卡托投影，所以maxExtent和resolutions可以直接设置好
         options = SuperMap.Util.extend({

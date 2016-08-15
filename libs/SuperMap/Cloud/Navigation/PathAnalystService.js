@@ -99,7 +99,7 @@ SuperMap.Cloud.PathAnalystService = SuperMap.Class(SuperMap.ServiceBase, {
 		//参数封装，以利于传输		
         me.request({
             method: "GET",
-            params: {pathAnalystParameters: JSON.stringify(params)},
+            params: {pathAnalystParameters: JSON.stringify([params])},
             scope: me,
             success: me.pathAnalystComplete,
             failure: me.pathAnalystError

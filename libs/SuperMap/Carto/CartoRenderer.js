@@ -135,7 +135,7 @@ SuperMap.CartoRenderer = SuperMap.Class({
      * Returns:
      * {Boolean} true代表绘制完成，false或者undefined则表示要素无geometry属性
      */
-    drawFeature: function(feature, style) {
+    drawFeature: function(feature, style, layerType) {
         if(!this.context){
             return;
         }
@@ -152,7 +152,7 @@ SuperMap.CartoRenderer = SuperMap.Class({
                 //将要素ID以及图层索引转化为颜色值
                 hitColor=this.featureIdToHex(feature.id,feature.layerIndex);
             }
-            var rendered = this.drawGeometry(ctx,feature.geometry, st,hitColor);
+            var rendered = this.drawGeometry(ctx,feature.geometry, st,hitColor, feature.searchValues, layerType);
             return rendered;
         }
     },
@@ -168,7 +168,7 @@ SuperMap.CartoRenderer = SuperMap.Class({
      * style - {Object} 渲染属性信息
      * hitColor - {String} 热点区的颜色
      */
-    drawGeometry:function(ctx,geometry, style,hitColor) {
+    drawGeometry:function(ctx,geometry, style,hitColor, searchValues, layerType) {
         var type=geometry.type;
         if(!style) {
             style= SuperMap.CartoRenderer._expandCanvasStyle[type];
@@ -189,7 +189,11 @@ SuperMap.CartoRenderer = SuperMap.Class({
                 drawed = this.drawText(ctx,geometry, style);
                 break;
             case "POINT":
-                drawed = this.drawPoint(ctx,geometry, style);
+                if(searchValues && layerType === "THEME"){
+                    drawed = this.drawText(ctx,geometry, style, searchValues);
+                }else{
+                    drawed = this.drawPoint(ctx,geometry, style);
+                }
                 break;
             case "LINE":
                 if(Math.round(parseFloat(style.lineWidth))===0){
@@ -217,10 +221,10 @@ SuperMap.CartoRenderer = SuperMap.Class({
      * geometry - {Object} 文本几何体，其拥有parts和points两个属性
      * style - {Object} 渲染风格
      * */
-    drawText:function(ctx,geometry, style) {
+    drawText:function(ctx,geometry, style, searchValues) {
         var hitCtx=this.hitContext;
         //有些瓦片里面没有文字，就不会有这个属性，没有则直接跳过
-        if(!geometry.texts)
+        if(!geometry.texts && !searchValues)
         {
             return;
         }
@@ -229,7 +233,7 @@ SuperMap.CartoRenderer = SuperMap.Class({
         for (var i = 0; i < geometry.parts.length; i++) {
             var part = geometry.parts[i];
             //获取文本
-            var text = geometry.texts[i];
+            var text = searchValues || geometry.texts[i];
 
             var x=  geometry.points[startIndex * 2];
             var y=  geometry.points[startIndex * 2 + 1];
@@ -264,6 +268,8 @@ SuperMap.CartoRenderer = SuperMap.Class({
         }
         return true;
     },
+
+
 
     /**
      * Method:drawPoint
@@ -659,8 +665,8 @@ SuperMap.CartoRenderer._expandCanvasStyle = {
         direction:"ltr",
         /*expand*/
         haloRadius:1,
-        backColor:"rgba(255,255,255,1)",
-        foreColor:"rgba(0,0,0,1)",
+        backColor:"rgba(0,0,0,0)",
+        foreColor:"rgba(0,0,0,0)",
         offsetX:0,
         offsetY:0,
         textHeight:0,
@@ -686,7 +692,7 @@ SuperMap.CartoRenderer._expandCanvasStyle = {
         imageSmoothingEnabled:true
     },
     "LINE":{
-        strokeStyle:"rgba(255,255,255,1)",
+        strokeStyle:"rgba(0,0,0,0)",
         lineWidth:1,
         lineCap:"butt",
         lineJoin:"round",
@@ -702,7 +708,7 @@ SuperMap.CartoRenderer._expandCanvasStyle = {
     },
     "REGION":{
         /*包含LINE的部分*/
-        strokeStyle:"rgba(255,255,255,1)",
+        strokeStyle:"rgba(0,0,0,0)",
         lineWidth:1,
         lineCap:"butt",
         lineJoin:"round",
@@ -712,7 +718,7 @@ SuperMap.CartoRenderer._expandCanvasStyle = {
         lineOpacity:1,
         lineDasharray:[],
 
-        fillStyle: "rgba(0,0,0,1)",
+        fillStyle: "rgba(0,0,0,0)",
         polygonOpacity:1,
 
         /*expand*/
@@ -725,7 +731,7 @@ SuperMap.CartoRenderer._expandCanvasStyle = {
     },
     "SHADOW":{
         shadowBlur:0,
-        shadowColor:"rgba(0,0,0,1)",
+        shadowColor:"rgba(0,0,0,0)",
         shadowOffsetX:0,
         shadowOffsetY:0
     },

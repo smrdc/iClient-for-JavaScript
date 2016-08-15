@@ -166,7 +166,7 @@ SuperMap.Control.ChangeTilesVersion = SuperMap.Class(SuperMap.Control,{
      * APIMethod: destroy
      * 解构TiledDynamicRESTLayer类，释放资源。
      */
-    destory: function () {
+    destroy: function () {
         this.body = null;
         this.infDiv = null;
         this.layer = null;

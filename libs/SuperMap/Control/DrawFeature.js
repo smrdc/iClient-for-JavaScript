@@ -147,6 +147,10 @@ SuperMap.Control.DrawFeature = SuperMap.Class(SuperMap.Control, {
             );
         }
         this.handler = new handler(this, this.callbacks, this.handlerOptions);
+
+        if(this.layer && this.layer.CLASS_NAME === "SuperMap.Layer.PlottingLayer"){
+            this.layer.drawGraphicObject = this;
+        }
     },
 
     /**
@@ -163,8 +167,16 @@ SuperMap.Control.DrawFeature = SuperMap.Class(SuperMap.Control, {
             var lonlat = this.map.getLonLatFromPixel(geometry);
             var geometry = new SuperMap.Geometry.Point(lonlat.lon,lonlat.lat);
         }
-        var feature = new SuperMap.Feature.Vector(geometry);
-        if(this.style) feature.style=this.style;
+		
+		var feature = null;
+        if(geometry.CLASS_NAME === "SuperMap.Feature.Vector"){
+            feature = geometry;
+        } else {
+            feature = new SuperMap.Feature.Vector(geometry);
+            if(this.style) feature.style=this.style;
+        }
+        //var feature = new SuperMap.Feature.Vector(geometry);
+        //if(this.style) feature.style=this.style;
         var proceed = this.layer.events.triggerEvent(
             "sketchcomplete", {feature: feature}
         );

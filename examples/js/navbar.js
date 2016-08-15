@@ -23,7 +23,8 @@
                 {href:"examples/TileVectorTopic.html",text:"矢量分块专题"},
                 {href:"examples/AnimatorTopic.html",text:"时空数据专题"},
                 {href:"examples/ThemeLayerGraphTopic.html",text:"客户端统计专题图专题"}
-            ]}
+            ]},
+            {href:"examples/PlottingTopic.html",text:"动态标绘专题"}
         ]
         }
     ];

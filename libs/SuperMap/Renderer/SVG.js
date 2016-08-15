@@ -363,8 +363,8 @@ SuperMap.Renderer.SVG = SuperMap.Class(SuperMap.Renderer.Elements, {
                 }
             }else{
                 node.setAttributeNS(null, "fill", fillColor);
+				node.setAttributeNS(null, "fill-opacity", style.fillOpacity);
             }
-            node.setAttributeNS(null, "fill-opacity", style.fillOpacity);
         } else {
             node.setAttributeNS(null, "fill", "none");
         }
@@ -1027,6 +1027,15 @@ SuperMap.Renderer.SVG = SuperMap.Class(SuperMap.Renderer.Elements, {
             nodeId=geometryId+"_linearGradient";
             node = SuperMap.Util.getElement(nodeId);
             if(node){
+				for(var i= 0,len = fill.colorStops.length;i<len;i++){
+                    var colorStop = fill.colorStops[i];
+                    var stopNode = node.childNodes[i];
+                    var style = "stop-color:"+colorStop.color+";stop-opacity:"+colorStop.opacity;
+                    stopNode.style.StopColor = colorStop.color;
+                    stopNode.style.StopOpacity = colorStop.opacity;
+                    stopNode.setAttributeNS(null,"style",style);
+                }
+
                 return nodeId;
             }
             node=this.nodeFactory(nodeId, "linearGradient");
@@ -1038,6 +1047,14 @@ SuperMap.Renderer.SVG = SuperMap.Class(SuperMap.Renderer.Elements, {
             nodeId=geometryId+"_radialGradient";
             node = SuperMap.Util.getElement(nodeId);
             if(node){
+				for(var i= 0,len = fill.colorStops.length;i<len;i++){
+                    var colorStop = fill.colorStops[i];
+                    var stopNode = node.childNodes[i];
+                    var style = "stop-color:"+colorStop.color+";stop-opacity:"+colorStop.opacity;
+                    stopNode.style.StopColor = colorStop.color;
+                    stopNode.style.StopOpacity = colorStop.opacity;
+                    stopNode.setAttributeNS(null,"style",style);
+                }
                 return nodeId;
             }
             node=this.nodeFactory(nodeId, "radialGradient");
@@ -1084,6 +1101,80 @@ SuperMap.Renderer.SVG = SuperMap.Class(SuperMap.Renderer.Elements, {
         return featureId;
     },
 
+ /**
+     * Method: copyCellStyle
+     * Copy featureStyle to CellStyle.
+     *
+     * Parameters:
+     * cellStyle - {Object}
+     * featureStyle - {Object}
+     * geometry - {<SuperMap.Geometry.GeoGraphicObject>}
+     */
+    copyCellStyle: function(cellStyle, featureStyle, geometry){
+        if(cellStyle.surroundLineFlag){
+            if(geometry.surroundLineType === SuperMap.Plot.AlgoSurroundLineType.ALL){
+                cellStyle.strokeWidth = featureStyle.surroundLineWidth*2 + featureStyle.strokeWidth;
+            } else {
+                cellStyle.strokeWidth = featureStyle.surroundLineWidth;
+            }
+            cellStyle.strokeColor = featureStyle.surroundLineColor;
+            cellStyle.strokeOpacity = featureStyle.surroundLineColorOpacity;
+        } else {
+            if(!cellStyle.lineWidthLimit){
+                cellStyle.strokeWidth = featureStyle.strokeWidth;
+            }
+            if(!cellStyle.lineColorLimit){
+                cellStyle.strokeColor = featureStyle.strokeColor;
+                cellStyle.strokeOpacity = featureStyle.strokeOpacity;
+            }
+            if(!cellStyle.lineTypeLimit){
+                cellStyle.strokeDashstyle = featureStyle.strokeDashstyle;
+            }
+        }
+
+        if(!cellStyle.fillLimit){
+            if(cellStyle.fillColor instanceof SuperMap.Style.Gradient){
+                cellStyle.fillColor.destroy();
+                cellStyle.fillColor = null;
+            }
+
+            if(featureStyle.fillGradientMode === "LINEAR" || featureStyle.fillGradientMode === "RADIAL"){
+                cellStyle.fill = true;
+
+                var colorStops = [];
+                colorStops.push({offset:0.0,color:featureStyle.fillColor, opacity:featureStyle.fillOpacity});
+                colorStops.push({offset:1.0,color:featureStyle.fillBackColor, opacity:featureStyle.fillBackOpacity});
+
+                if(featureStyle.fillGradientMode === "LINEAR"){
+                    cellStyle.fillColor = new SuperMap.Style.LinearGradient(0.0, 0.0, 1.0, 0.0, colorStops);
+                } else if(featureStyle.fillGradientMode === "RADIAL"){
+                    cellStyle.fillColor = new SuperMap.Style.RadialGradient(0.5, 0.5, 1.0, 0.5, 0.5, colorStops);
+                }
+            } else {
+                cellStyle.fill = featureStyle.fill;
+                cellStyle.fillColor = featureStyle.fillColor;
+                cellStyle.fillOpacity = featureStyle.fillOpacity;
+            }
+
+        } else if(geometry.symbolType === 1 && cellStyle.fillLimit){
+            if(!cellStyle.fillColorLimit ){
+                cellStyle.fillColor = featureStyle.strokeColor;
+                cellStyle.fillOpacity = featureStyle.strokeOpacity;
+            }
+        }
+
+        if(!cellStyle.fontSizeLimit || cellStyle.fontSizeLimit === false){
+            cellStyle.fontSize = featureStyle.fontSize;
+        }
+        if(!cellStyle.fontColorLimit || cellStyle.fontColorLimit === false){
+            cellStyle.fontColor = featureStyle.fontColor;
+        }
+
+        if(featureStyle.display){
+            cellStyle.display = featureStyle.display;
+        }
+    },
+	
     CLASS_NAME: "SuperMap.Renderer.SVG"
 });
 

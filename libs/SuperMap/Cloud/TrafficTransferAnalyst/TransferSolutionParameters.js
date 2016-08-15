@@ -48,6 +48,12 @@ SuperMap.Cloud.TransferSolutionParameters = SuperMap.Class({
      * {Integer} 返回结果最大个数，默认 5。
      */
 	resultCount: 5,
+
+	/**
+	 * APIProperty: to
+	 * {Number} 输出结果坐标类型，默认值：910101。支持的坐标类型编码参考 http://www.supermapol.com/developer/webapi.html?title=convert 。
+	 */
+	to: 910101,
 	
     
     /**

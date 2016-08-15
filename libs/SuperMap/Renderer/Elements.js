@@ -479,6 +479,17 @@ SuperMap.Renderer.Elements = SuperMap.Class(SuperMap.Renderer, {
      */
     getNodeType: function(geometry, style) { },
 
+	/**
+     * Method: copyCellStyle
+     * Copy featureStyle to CellStyle.
+     *
+     * Parameters:
+     * cellStyle - {Object}
+     * featureStyle - {Object}
+     * geometry - {<SuperMap.Geometry.GeoGraphicObject>}
+     */
+    copyCellStyle: function(cellStyle, featureStyle, geometry){},
+	
     /** 
      * Method: drawGeometry 
      * Draw the geometry, creating new nodes, setting paths, setting style,
@@ -495,16 +506,61 @@ SuperMap.Renderer.Elements = SuperMap.Class(SuperMap.Renderer, {
      *     incomplete; false otherwise
      */
     drawGeometry: function(geometry, style, featureId) {
+		function reDrawSurroundLine(geometry, featureStyle){
+            var reDrawSurroundLineFlag = false;
+
+            if(geometry.symbolType !== SuperMap.Plot.SymbolType.DOTSYMBOL && (geometry.surroundLineType === SuperMap.Plot.AlgoSurroundLineType.INNER || geometry.surroundLineType === SuperMap.Plot.AlgoSurroundLineType.OUT)){
+                for(var i = 0; i < geometry.components.length; i++){
+                    if(geometry.components[i].style.surroundLineFlag && featureStyle.surroundLineWidth !== geometry.components[i].style.strokeWidth){
+                        reDrawSurroundLineFlag = true;
+                    } else if(!geometry.components[i].style.surroundLineFlag && featureStyle.strokeWidth !== geometry.components[i].style.strokeWidth){
+                        reDrawSurroundLineFlag = true;
+                    }
+                }
+            }
+
+            if(reDrawSurroundLineFlag){
+                geometry.dOffset = featureStyle.surroundLineWidth/2.0 + featureStyle.strokeWidth/2.0;
+
+                for(var j = 0; j < geometry.components.length; j++) {
+                    if(geometry.components[j].style.surroundLineFlag && geometry.components[j].originSymbolCell && geometry.components[j].originSymbolCell !== null){
+                        geometry.components[j] = geometry.handleSurroundLine(geometry.components[j].originSymbolCell);
+                    }
+                }
+            }
+        }
+		
         var className = geometry.CLASS_NAME;
         var rendered = true;
         if ((className === "SuperMap.Geometry.Collection") ||
             (className === "SuperMap.Geometry.MultiPoint") ||
             (className === "SuperMap.Geometry.MultiLineString") ||
+			(className === "SuperMap.Geometry.GeoGraphicObject.DotSymbol") ||
+			(className === "SuperMap.Geometry.GeoGraphicObject.AlgoSymbol") ||
             (className === "SuperMap.Geometry.MultiPolygon")||geometry.isMultiPlotting||
             (className === "SuperMap.REST.Route")) {
             for (var i = 0, len=geometry.components.length; i<len; i++) {
-                rendered = this.drawGeometry(
-                    geometry.components[i], style, featureId) && rendered;
+				//军标符号的处理
+                if((className === "SuperMap.Geometry.GeoGraphicObject.DotSymbol") || 
+				(className === "SuperMap.Geometry.GeoGraphicObject.AlgoSymbol")){
+                    reDrawSurroundLine(geometry, style);
+                    this.copyCellStyle(geometry.components[i].style, style, geometry);
+
+                    if(geometry.components[i].CLASS_NAME === "SuperMap.Geometry.GeoText"){
+                        //featureId, style, location
+                        var location = new SuperMap.Geometry.Point(geometry.components[i].x, geometry.components[i].y);
+                        geometry.components[i].style.label = geometry.components[i].text.toString();
+                        this.drawText(featureId + i.toString(),geometry.components[i].style,location);
+                        rendered = true;
+                    }
+                    else{
+                        rendered = this.drawGeometry(geometry.components[i], geometry.components[i].style, featureId) && rendered;
+                    }
+                }
+                else{
+                    rendered = this.drawGeometry(
+                        geometry.components[i], style, featureId) && rendered;
+                }
             }
             return rendered;
         };
@@ -820,7 +876,18 @@ SuperMap.Renderer.Elements = SuperMap.Class(SuperMap.Renderer, {
      * {DOMElement} or false if the renderer could not draw the surface
      */ 
     drawSurface: function(node, geometry) {},
-
+	
+	 /**
+     * Method: drawText
+     * 绘制文本
+     *
+     * Parameters:
+     * featureId - {String}
+     * style -
+     * location - {<SuperMap.Geometry.Point>}
+     */
+    drawText: function(featureId, style, location) {},
+	
     /**
      * Method: removeText
      * Removes a label

@@ -140,7 +140,7 @@ asyncTest("EditFeaturesService_AddFeatures_noParameters_Test",function(){
         try{
             var editFeaturesResult = serviceFailedEventArgsSystem.error;
             ok(editFeaturesResult !== null,"editFeaturesService");
-            equal(editFeaturesResult.errorMsg, "在FeaturesResource中，在把请求体转化成对象时失败","editFeaturesResult.errorMsg");
+            equal(editFeaturesResult.errorMsg, "在FeaturesResource中，在把请求体转化成对象时失败");
             
             editFeaturesService.destroy();
             ok(editFeaturesService.EVENT_TYPES === null,"editFeaturesService.EVENT_TYPES");

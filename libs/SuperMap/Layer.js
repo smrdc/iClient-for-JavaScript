@@ -1277,6 +1277,14 @@ SuperMap.Layer = SuperMap.Class({
             }else{
                 for(var i=0, len=this.div.childNodes.length; i<len; ++i) {
                     var element = this.div.childNodes[i].firstChild || this.div.childNodes[i] ;  // 添加 || this.div.childNodes[i] 考虑 this.div.childNodes[i].firstChild 不存在情况
+                    //var element;
+                    ////online vector图层 设置透明度无效  将svg标签透明度改到<g>标签上
+                    //if(this.renderer.CLASS_NAME === "SuperMap.Renderer.SVG" ){
+                    //     element = this.div.childNodes[i].childNodes[0];
+                    //}else{
+                    //     element = this.div.childNodes[i].firstChild || this.div.childNodes[i] ;  // 添加 || this.div.childNodes[i] 考虑 this.div.childNodes[i].firstChild 不存在情况
+                    //}
+
                     SuperMap.Util.modifyDOMElement(element, null, null, null, 
                                                  null, null, null, opacity);
                 }

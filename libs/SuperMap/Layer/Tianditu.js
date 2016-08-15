@@ -47,6 +47,14 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
      * {Number} 图片url中z值偏移量
      */
     zOffset:1,
+
+    /**
+     * APIProperty: dpi
+     * {Float} 屏幕上每英寸包含像素点的个数。
+     * 该参数结合图层比例尺可以推算出该比例尺下图层的分辨率.默认为96。
+     */
+    dpi: 96,
+
     /**
      * Constructor: SuperMap.Layer.Tianditu
      * 创建天地图图层
@@ -237,7 +245,7 @@ SuperMap.Layer.Tianditu = SuperMap.Class(SuperMap.CanvasLayer, {
             //this.numZoomLevels = 18;
 
             this.units = "m";
-            this.projection = new SuperMap.Projection("EPSG:900913");
+            this.projection = new SuperMap.Projection("EPSG:3857");
 
             this.maxExtent=new SuperMap.Bounds(
                 minX, minY, maxX, maxY

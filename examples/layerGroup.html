@@ -147,6 +147,7 @@
 
             var setLayerStatusService = new SuperMap.REST.SetLayerStatusService(url);
             setLayerStatusService.events.on({ "processCompleted": createTempLayerCompleted});
+            setLayerStatusService.events.on({ "processFailed": createTempLayerFailed});
             setLayerStatusService.processAsync(layerStatusParameters);
         }
 
@@ -184,6 +185,11 @@
             layer = new SuperMap.Layer.TiledDynamicRESTLayer("World", url, {transparent: true, cacheEnabled: false, redirect: true, layersID: tempLayerID}, {maxResolution: "auto", bufferImgCount: 0});
             layer.bufferImgCount = 0;
             layer.events.on({"layerInitialized": addLayer});
+        }
+
+        //显示错误信息
+        function createTempLayerFailed(result){
+            alert(result.error.errorMsg);
         }
 
         function addLayer() {

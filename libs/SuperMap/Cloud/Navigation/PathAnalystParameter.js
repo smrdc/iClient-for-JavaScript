@@ -40,6 +40,12 @@ SuperMap.Cloud.PathAnalystParameter = SuperMap.Class({
      * {Boolean} 是否返回路径，默认为true。
      */
     returnPathPoints: true,
+
+    /**
+     * APIProperty: to
+     * {Number} 输出结果坐标类型，默认值：910101。支持的坐标类型编码参考 http://www.supermapol.com/developer/webapi.html?title=convert 。
+     */
+    to: 910101,
 	
 	/**
      * Constructor: SuperMap.Cloud.PathAnalystParameter
@@ -71,6 +77,7 @@ SuperMap.Cloud.PathAnalystParameter = SuperMap.Class({
         me.endPoint = null;
         me.passPoints = null;
 		me.routeMode = null;
+        me.to = null;
     },
 	
 	CLASS_NAME: "SuperMap.Cloud.PathAnalystParameter"

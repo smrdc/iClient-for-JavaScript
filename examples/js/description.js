@@ -25,6 +25,8 @@ DemoDescription['bing']={title:'bing图层',desc:'使用bing地图的API创建bi
 DemoDescription['3tianditu'] = {title: '天地图图层', desc: '使用天地图的API创建图层，并添加到map上', oper: '点击图标，弹出图片框。' }
 DemoDescription['3baidu'] = {title: '百度图层', desc: '使用百度的API创建图层，并添加到map上', oper: '若为无覆盖物状态，点击加载数据，若为有覆盖物状态，可点击清除。' }
 DemoDescription['3Siweidg']={title:'四维图新图层',desc:'使用四维图新的API创建图层，并添加到map上', oper: '点击绘制（点、线、面）按钮，可进行绘制编辑。' }
+DemoDescription['3googlelayer']={title:'Google图层',desc:'使用Google的API创建图层，并添加到map上，添加矢量图层显示点要素', oper: '使用鼠标进行放大，缩小，平移等操作。' }
+DemoDescription['3osm']={title:'OSM图层',desc:'使用OSM的API创建图层，并添加到map上，添加矢量图层显示点要素', oper: '使用鼠标进行放大，缩小，平移等操作。' }
 
 DemoDescription['translation'] = {title: '缩放平移', desc: '定义：此范例展示放大、缩小、平移接口，即不通过地图控件对地图进行缩放平移操作。', oper: '通过点击放大，缩小，平移按钮进行操作。' }
 DemoDescription['zoomRange'] = {title: '设置缩放级别', desc: '定义：此范例展示设置地图的缩放级别，初始化时地图的缩放级别为0,缩放级别的数量为5。', oper: '通过鼠标滑动放大缩小。' }
@@ -175,6 +177,23 @@ DemoDescription['wms'] = {title: 'WMS图层', desc: ' WMS（Web Map Service，We
 DemoDescription['kml'] = {title: 'kml图层', desc: '定义：加载kml图层到地图上。', oper: '点击加载按钮来加载kml图层。' }
 DemoDescription['GeoJSON'] = {title: 'GeoJSON数据展示', desc: '定义：展示GeoJSON格式的数据', oper: '无' }
 DemoDescription['queryByWFS'] = {title: 'WFS 查询', desc: '定义：对地图进行GerFeature查询，通过get请求返回世界首都地理信息。',oper: 'WFS服务需要在发布的情况下使用' }
+
+//动态标绘
+DemoDescription['plot'] = {title: '动态标绘', desc: '此范例展示可以选中标绘面板上的标号，标绘在地图上;选中标号可以在属性面板中展示和修改标号的属性。',oper: '1、选择标绘面板中的一个标号；2、点击地图，就可以把标号标绘到地图上；3、点击取消标绘按钮；4、选择地图上的一个标号，可以在属性面板中查看并且修改标号的属性。' }
+DemoDescription['plotSymbol'] = {title: '鼠标标绘', desc: '此范例展示可以选中标绘面板上的标号，标绘在地图上。',oper: '1、选择标绘面板中的一个标号；2、点击地图，就可以把标号标绘到地图上。' }
+DemoDescription['drawGeoGraphicObject'] = {title: '编程绘制', desc: '此范例展示编程绘制动态标绘对象。', oper: '点击按钮，绘制相应的标号。'}
+DemoDescription['modifySymbolStyle'] = {title: '属性修改', desc: '此范例展示在属性面板中修改标号属性。', oper: '1、选择地图上的一个标号；2、可以在属性面板中查看并修改其属性。'}
+DemoDescription['symbolExtendProperty'] = {title: '自定义属性', desc: '此范例展示给标号添加自定义属性。', oper: '1、选择地图上的一个标号；2、在编辑框中添加属性名和属性值；3、点击添加按钮，可以将自定义属性添加到标号中。'}
+DemoDescription['operatePlottingLayer'] = {title: '图层操作', desc: '此范例展示创建和删除标绘图层。', oper: '1、点击“创建图层”按钮，创建一个标绘图层并添加到地图上，这里图层名字随机生成；2、点击“删除图层”按钮，可以删除指定图层，这里删除最后创建的图层。' }
+DemoDescription['editPlottingLayer'] = {title: '图层编辑', desc: '此范例展示编辑标绘图层的可编辑性和可锁定性。', oper: '当图层的可编辑性为true，可锁定性为false时，点击“绘制标号”按钮，是可以正常的绘制和编辑标号对象的；而当图层可锁定性为true时，可以绘制对象，但无法用鼠标编辑对象；而图层的可编辑性为false时，标号对象不可以绘制也不可以编辑。' }
+DemoDescription['defaultStyle'] = {title: '缺省属性', desc: '此范例展示缺省属性的使用方法。', oper: '在使用缺省属性的情况下，修改线宽、线色、线型及大小后，绘制标号的默认样式采用缺省属性样式' }
+DemoDescription['symbolEditor'] = {title: '编辑器', desc: '此范例展示对标号进行复制、剪切和粘贴。', oper: '1、在地图上选择一个标号；2、点击复制或者剪切按钮；3、点击粘贴按钮，可以选择标号的位置标绘一个相同的标号。' }
+DemoDescription['loadSymbolLib'] = {title: '标号库加载', desc: '此范例展示从标绘服务中加载标号库，并显示标号库信息。', oper: '1、点击标绘按钮，可以在地图上绘制标号库中的一个标号；2、点击取消标绘按钮，可以取消对该标号的绘制。' }
+DemoDescription['querySymbolLib'] = {title: '查询标号', desc: '此范例展示查询标号库中的标号。', oper: '。1、在编辑框内输入要查询的关键字；2、点击查询按钮，可以显示标号库中符合查询条件的标号；3、可以单击查询结果面板上的Icon，绘制标号。' }
+DemoDescription['symbolGeometricQuery'] = {title: '几何查询', desc: '此范例展示对图层进行几何查询。', oper: '。1、点击相应的按钮，可以绘制一个查询区域；2、当查询区域绘制结束后，符合查询条件的标号的线色会显示成蓝色。' }
+DemoDescription['saveload'] = {title: '态势图保存和下载', desc: '此范例展示态势图的保存和加载。', oper: '1、点击保存按钮，可以将地图上的标绘的内容保存成态势图并保存到服务器上；2、点击清除按钮清空地图上的标号；3、点击加载按钮，可以加载保存的态势图。'}
+DemoDescription['addfile'] = {title: '态势图叠加', desc: '此范例展示态势图文件的打开、叠加和添加到指定图层。', oper: '1、选择一个本地的态势图文件，点击“叠加”按钮，会将这个态势图文件上传到服务上，然后再将态势图里的信息显示到地图上（不会清空地图上的其他标号）；2、选择一个本地的态势图文件，点击“添加到指定图层”按钮，会将这个态势图文件上传到服务器，然后将态势图文件的信息添加到指定的图层上显示（不会清空地图上的其他标号）；3 选择一个本地的态势图文件，点击“打开”按钮，会将这个态势图文件上传到服务器上，将地图的标号全部清空，然后再将态势图里的信息显示到地图上。 '}
+DemoDescription['filetransfer'] = {title: '态势图上传下载', desc: '此范例展示态势图文件的上传和下载。', oper: '1、选择一个本地的态势图文件，点击上传按钮，可以将这个态势图文件上传到服务器；2、选择态势图列表中的文件名称，点击下载按钮，可以从服务器下载相应的态势图文件；3、在编辑框中输入态势图的名称，点击删除指定的态势图文件按钮，可以从服务器上删除该态势图文件' }
 
 //其他
 DemoDescription['mapPrint'] = {title: '地图打印', desc: '定义：地图打印功能主要用于打印地图数据，同时可以打印矢量元素以及信息框等。', oper: '点击“标注”按钮，生成标注，再点击标注弹出信息框，点击“打印地图”按钮打印地图。展示打印地图数据、标注图层和信息框类。 ' }

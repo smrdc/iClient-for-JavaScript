@@ -65,7 +65,7 @@ SuperMap.Layer.OSM = SuperMap.Class(SuperMap.CanvasLayer, {
      */
     initialize: function(name, options) {
         options = SuperMap.Util.extend({
-            projection: "EPSG:900913",
+            projection: "EPSG:3857",
             numZoomLevels: 16
         }, options);
         SuperMap.CanvasLayer.prototype.initialize.apply(this,[name,this.url,{},options] );

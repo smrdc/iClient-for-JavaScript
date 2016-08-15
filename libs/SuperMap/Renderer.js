@@ -213,6 +213,12 @@ SuperMap.Renderer = SuperMap.Class({
 
                 var rendered = this.drawGeometry(feature.geometry, style, feature.id);
 
+				//新增军标符号的  应对Geotext 中的文本信息
+                if((feature.geometry.CLASS_NAME === "SuperMap.Geometry.GeoGraphicObject.DotSymbol") ||
+                    (feature.geometry.CLASS_NAME === "SuperMap.Geometry.GeoGraphicObject.AlgoSymbol")){
+                    return true;
+                }
+				
                 if(style.display !== "none" && style.label && rendered !== false) {
 
                     //var location = feature.geometry.getCentroid();

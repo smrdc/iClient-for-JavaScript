@@ -85,6 +85,8 @@ SuperMap.Lang.en = {
     'm': "m",
     'ft': "ft",
 
+    'cloudLayerAttr': '©2014 SuperMap - GS(2014)6070号-data©Navinfo',
+
     //VectorMapEditor
     'editorName':"VectorMapEditor",
     'layerList':"LayerList",

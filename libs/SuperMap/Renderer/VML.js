@@ -272,8 +272,25 @@ SuperMap.Renderer.VML = SuperMap.Class(SuperMap.Renderer.Elements, {
             if (!fill) {
                 fill = this.createNode('olv:fill', node.id + "_fill");
             }
-            fill.opacity = style.fillOpacity;
+			
+            if(style.fillGradientMode === "LINEAR" || style.fillGradientMode === "RADIAL"){
+                if(style.fillGradientMode === "LINEAR"){
+                    fill.type = "gradient";
+                    fill.focus = "-100%";
+                } else if(style.fillGradientMode === "RADIAL"){
+                    fill.type = "gradientradial";
+                    fill.focusposition = "50%, 50%";
+                }
 
+                fill.color = style.fillColor;
+                fill.color2 = style.fillColor2;
+
+                fill.opacity = style.fillOpacity;
+                fill.opacity2 = style.fillOpacity2;
+            } else {
+                fill.opacity = style.fillOpacity;
+            }
+			
             if (node._geometryClass === "SuperMap.Geometry.Point" &&
                     style.externalGraphic) {
 
@@ -1014,6 +1031,72 @@ SuperMap.Renderer.VML = SuperMap.Class(SuperMap.Renderer.Elements, {
         return cache;
     },
     
+/**
+     * Method: copyCellStyle
+     * Copy featureStyle to CellStyle.
+     *
+     * Parameters:
+     * cellStyle - {Object}
+     * featureStyle - {Object}
+     * geometry - {<SuperMap.Geometry.GeoGraphicObject>}
+     */
+    copyCellStyle: function(cellStyle, featureStyle, geometry){
+        if(cellStyle.surroundLineFlag){
+            if(geometry.surroundLineType === SuperMap.Plot.AlgoSurroundLineType.ALL){
+                cellStyle.strokeWidth = featureStyle.surroundLineWidth*2 + featureStyle.strokeWidth;
+            } else {
+                cellStyle.strokeWidth = featureStyle.surroundLineWidth;
+            }
+            cellStyle.strokeColor = featureStyle.surroundLineColor;
+            cellStyle.strokeOpacity = featureStyle.surroundLineColorOpacity;
+        } else {
+            if(!cellStyle.lineWidthLimit){
+                cellStyle.strokeWidth = featureStyle.strokeWidth;
+            }
+            if(!cellStyle.lineColorLimit){
+                cellStyle.strokeColor = featureStyle.strokeColor;
+                cellStyle.strokeOpacity = featureStyle.strokeOpacity;
+            }
+            if(!cellStyle.lineTypeLimit){
+                cellStyle.strokeDashstyle = featureStyle.strokeDashstyle;
+            }
+        }
+
+        if(!cellStyle.fillLimit){
+            if(featureStyle.fillGradientMode === "LINEAR" || featureStyle.fillGradientMode === "RADIAL"){
+                cellStyle.fill = true;
+
+                cellStyle.fillColor = featureStyle.fillColor;
+                cellStyle.fillColor2 = featureStyle.fillBackColor;
+                cellStyle.fillGradientMode = featureStyle.fillGradientMode;
+                cellStyle.fillOpacity = featureStyle.fillOpacity;
+                cellStyle.fillOpacity2 = featureStyle.fillBackOpacity;
+            } else {
+                cellStyle.fillGradientMode = featureStyle.fillGradientMode;
+                cellStyle.fill = featureStyle.fill;
+                cellStyle.fillColor = featureStyle.fillColor;
+                cellStyle.fillOpacity = featureStyle.fillOpacity;
+            }
+
+        } else if(geometry.symbolType === 1 && cellStyle.fillLimit){
+            if(!cellStyle.fillColorLimit ){
+                cellStyle.fillColor = featureStyle.strokeColor;
+                cellStyle.fillOpacity = featureStyle.strokeOpacity;
+            }
+        }
+
+        if(!cellStyle.fontSizeLimit || cellStyle.fontSizeLimit === false){
+            cellStyle.fontSize = featureStyle.fontSize;
+        }
+        if(!cellStyle.fontColorLimit || cellStyle.fontColorLimit === false){
+            cellStyle.fontColor = featureStyle.fontColor;
+        }
+
+        if(featureStyle.display){
+            cellStyle.display = featureStyle.display;
+        }
+    },
+
     CLASS_NAME: "SuperMap.Renderer.VML"
 });
 

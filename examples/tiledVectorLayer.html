@@ -38,7 +38,7 @@
                     }
                 })]
             });
-            layer = new SuperMap.Layer.TiledVectorLayer("China", url,{cacheEnabled:true},{useLocalStorage:true});
+            layer = new SuperMap.Layer.TiledVectorLayer("China", url,{cacheEnabled:true,returnAttributes:true},{useLocalStorage:true});
             layer.events.on({"layerInitialized": addLayer});
         }
 

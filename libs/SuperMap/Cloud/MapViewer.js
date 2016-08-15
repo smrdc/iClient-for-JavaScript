@@ -85,6 +85,8 @@ SuperMap.Cloud.MapViewer=SuperMap.Class({
      * */
     displayCoords:false,
 
+    hasBaseLayer:null,
+
     /**
      * Property: EVENT_TYPES
      * {Array} 事件数据
@@ -160,6 +162,7 @@ SuperMap.Cloud.MapViewer=SuperMap.Class({
         if(this.eventListeners instanceof Object) {
             this.events.on(this.eventListeners);
         }
+        this.hasBaseLayer = false;
         this.actived=true;
     },
 
@@ -308,6 +311,10 @@ SuperMap.Cloud.MapViewer=SuperMap.Class({
             if(layerType!=="BASE_LAYER"){
                 //如果图层不是底图，则先加到图层队列里面等待底图完成后再处理
                 layerQueue.unshift(layerInfo);
+                if(this.hasBaseLayer){
+                    //底图加载完成后开始处理图层队列里的图层
+                    this.createLayerByQueue(layerQueue);
+                }
                 continue;
             }else{
                 layerInfo.isBaseLayer=true;
@@ -344,6 +351,7 @@ SuperMap.Cloud.MapViewer=SuperMap.Class({
         this.setCenterByOption(center,level,bounds);
         //底图加载完成后开始处理图层队列里的图层
         this.createLayerByQueue(layerQueue);
+        this.hasBaseLayer = true;
         this.events.triggerEvent("baselayerInitialized",layer);
     },
 
@@ -475,6 +483,14 @@ SuperMap.Cloud.MapViewer=SuperMap.Class({
     createLayer:function(type,layerInfo){
         var layer;
         switch(type){
+            case "TIANDITU_VEC":
+            case "TIANDITU_IMG":
+            case "TIANDITU_TER":
+                layer=this.createTiandituLayer(layerInfo);
+                break;
+            case "BAIDU":
+                layer=this.createBaiduLayer(layerInfo);
+                break;
             case "WMS":
                 layer=this.createWmsLayer(layerInfo);
                 break;
@@ -540,6 +556,31 @@ SuperMap.Cloud.MapViewer=SuperMap.Class({
         }
     },
 
+    createTiandituLayer:function(layerInfo){
+        var title = layerInfo.title,
+            isLabel = (layerInfo.layerType === 'OVERLAY_LAYER'),
+            url = layerInfo.url,
+            projection = layerInfo.projection,
+            layerType = layerInfo.type.split('_')[1].toLowerCase();
+        var tdtLayer = new SuperMap.Layer.Tianditu({
+            name: title,
+            url: url,
+            layerType: layerType,
+            isLabel: isLabel,
+            projection: projection
+        });
+        if (isLabel) {
+            tdtLayer.setIsBaseLayer(false);
+        }else{
+            tdtLayer.setIsBaseLayer(true);
+        }
+        return tdtLayer;
+    },
+
+    createBaiduLayer:function(){
+        return new SuperMap.Layer.Baidu();
+    },
+
     /**
      * Method: createCloudLayer
      * 创建云图层
@@ -578,12 +619,30 @@ SuperMap.Cloud.MapViewer=SuperMap.Class({
                 opacity: opacity
             });
         } else {
+            var layerID = "";
+            if(subLayers && subLayers.length > 0){
+                layerID = "[0:";
+                for (var i = 0; i < subLayers.length; i++){
+                    var sublayer = subLayers[i];
+                    if(sublayer.visible){
+                        if(i<subLayers.length)
+                        {
+                            layerID += sublayer.id.toString();
+                        }
+                        if(i<subLayers.length-1)
+                        {
+                            layerID += ",";
+                        }
+                    }
+                }
+                layerID += "]";
+            }
             if (epsgCode === -1000) {
                 tiledLayer = new SuperMap.Layer.TiledDynamicRESTLayer(title, url, {
                     transparent: true,
                     cacheEnabled: true,
                     redirect: false,
-                    layersID: subLayers
+                    layersID: layerID
                 }, {
                     resolutions: resolutions,
                     maxResolution: "auto",
@@ -596,7 +655,7 @@ SuperMap.Cloud.MapViewer=SuperMap.Class({
                     transparent: true,
                     cacheEnabled: false,
                     redirect: false,
-                    layersID: subLayers
+                    layersID: layerID
                 }, {
                     resolutions: resolutions,
                     maxResolution: "auto",

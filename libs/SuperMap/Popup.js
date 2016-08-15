@@ -518,62 +518,63 @@ SuperMap.Popup = SuperMap.Class({
                 containerElement: containerElement
             }
         );
-
-        // is the "real" size of the div is safe to display in our map?
-        var safeSize = this.getSafeContentSize(realSize);
-
-        var newSize = null;
-        if (safeSize.equals(realSize)) {
-            //real size of content is small enough to fit on the map, 
-            // so we use real size.
-            newSize = realSize;
-
-        } else {
-
-            //make a new OL.Size object with the clipped dimensions 
-            // set or null if not clipped.
-            var fixedSize = new SuperMap.Size();
-            fixedSize.w = (safeSize.w < realSize.w) ? safeSize.w : null;
-            fixedSize.h = (safeSize.h < realSize.h) ? safeSize.h : null;
-        
-            if (fixedSize.w && fixedSize.h) {
-                //content is too big in both directions, so we will use 
-                // max popup size (safeSize), knowing well that it will 
-                // overflow both ways.                
-                newSize = safeSize;
-            } else {
-                //content is clipped in only one direction, so we need to 
-                // run getRenderedDimensions() again with a fixed dimension
-                var clippedSize = SuperMap.Util.getRenderedDimensions(
-                    preparedHTML, fixedSize, {
-                        displayClass: this.contentDisplayClass,
-                        containerElement: containerElement
-                    }
-                );
-                
-                //if the clipped size is still the same as the safeSize, 
-                // that means that our content must be fixed in the 
-                // offending direction. If overflow is 'auto', this means 
-                // we are going to have a scrollbar for sure, so we must 
-                // adjust for that.
-                //
-                var currentOverflow = SuperMap.Element.getStyle(
-                    this.contentDiv, "overflow"
-                );
-                if ( (currentOverflow !== "hidden") &&
-                     (clippedSize.equals(safeSize)) ) {
-                    var scrollBar = SuperMap.Util.getScrollbarWidth();
-                    if (fixedSize.w) {
-                        clippedSize.h += scrollBar;
-                    } else {
-                        clippedSize.w += scrollBar;
-                    }
-                }
-                
-                newSize = this.getSafeContentSize(clippedSize);
-            }
-        }                        
-        this.setSize(newSize);     
+        this.setSize(realSize);
+        //ICL_788
+        //// is the "real" size of the div is safe to display in our map?
+        //var safeSize = this.getSafeContentSize(realSize);
+        //
+        //var newSize = null;
+        //if (safeSize.equals(realSize)) {
+        //    //real size of content is small enough to fit on the map,
+        //    // so we use real size.
+        //    newSize = realSize;
+        //
+        //} else {
+        //
+        //    //make a new OL.Size object with the clipped dimensions
+        //    // set or null if not clipped.
+        //    var fixedSize = new SuperMap.Size();
+        //    fixedSize.w = (safeSize.w < realSize.w) ? safeSize.w : null;
+        //    fixedSize.h = (safeSize.h < realSize.h) ? safeSize.h : null;
+        //
+        //    if (fixedSize.w && fixedSize.h) {
+        //        //content is too big in both directions, so we will use
+        //        // max popup size (safeSize), knowing well that it will
+        //        // overflow both ways.
+        //        newSize = safeSize;
+        //    } else {
+        //        //content is clipped in only one direction, so we need to
+        //        // run getRenderedDimensions() again with a fixed dimension
+        //        var clippedSize = SuperMap.Util.getRenderedDimensions(
+        //            preparedHTML, fixedSize, {
+        //                displayClass: this.contentDisplayClass,
+        //                containerElement: containerElement
+        //            }
+        //        );
+        //
+        //        //if the clipped size is still the same as the safeSize,
+        //        // that means that our content must be fixed in the
+        //        // offending direction. If overflow is 'auto', this means
+        //        // we are going to have a scrollbar for sure, so we must
+        //        // adjust for that.
+        //        //
+        //        var currentOverflow = SuperMap.Element.getStyle(
+        //            this.contentDiv, "overflow"
+        //        );
+        //        if ( (currentOverflow !== "hidden") &&
+        //             (clippedSize.equals(safeSize)) ) {
+        //            var scrollBar = SuperMap.Util.getScrollbarWidth();
+        //            if (fixedSize.w) {
+        //                clippedSize.h += scrollBar;
+        //            } else {
+        //                clippedSize.w += scrollBar;
+        //            }
+        //        }
+        //
+        //        newSize = this.getSafeContentSize(clippedSize);
+        //    }
+        //}
+        //this.setSize(newSize);
     },    
 
     /**

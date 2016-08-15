@@ -465,7 +465,7 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
                 this.select(feature, evt);
             }
         }else{
-            this.layer.div.style.cursor="pointer";
+            this.layer.map.eventsDiv.style.cursor="pointer";
         }
     },
 
@@ -503,7 +503,7 @@ SuperMap.Control.SelectFeature = SuperMap.Class(SuperMap.Control, {
                 this.unselect(feature);
             }
         }else{
-            this.layer.div.style.cursor= null;
+            this.layer.map.eventsDiv.style.cursor='';
         }
     },
 

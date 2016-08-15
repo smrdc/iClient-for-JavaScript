@@ -86,7 +86,7 @@ SuperMap.Cloud.GeocodingResult.fromJson = function(jsonObject) {
     if (!jsonObject) {
         return null;
     }
-    var location = SuperMap.Geometry.Point(jsonObject.location.x,jsonObject.location.y);
+    var location = new SuperMap.Geometry.Point(jsonObject.location.x,jsonObject.location.y);
     var address = SuperMap.Cloud.AddressComponent.fromJson(jsonObject.address);
     var geometry = SuperMap.REST.ServerGeometry.fromJson(jsonObject.geometry);
     return new SuperMap.Cloud.GeocodingResult({

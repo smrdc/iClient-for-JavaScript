@@ -37,6 +37,7 @@
                        <li><a href="#analyst" data-toggle="tab">分析</a></li>
                        <li><a href="#expert" data-toggle="tab">可视化</a></li>
                        <li><a href="#ogc" data-toggle="tab">OGC</a></li>
+					   <li><a href="#plots" data-toggle="tab">动态标绘</a></li>
                         <li><a href="#others" data-toggle="tab">其他</a></li>
                    </ul>
 
@@ -94,6 +95,8 @@
                                        <ul class='nav nav-pills'>
                                            <li><a href='javascript:void(0)' target='_self' data-name='3tianditu'>天地图图层</a></li>
                                            <li><a href='javascript:void(0)' target='_self' data-name='3baidu'>百度图层</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='3googlelayer'>Google图层</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='3osm'>OSM图层</a></li>
                                            <!-- 四维目前不稳定 暂不对外提供
                                            <li><a href='javascript:void(0)' target='_self' data-name='3Siweidg'>四维图新</a></li>
                                            -->
@@ -466,6 +469,57 @@
                                </div>
                            </div>
 
+
+                       </div>
+					   <div class='tab-pane fade' id='plots'>
+                           <div class="container-fluid">
+                               <div class="row-fluid">
+                                   <div class="span2">
+                                       <ul class='nav nav-pills'><span >></span><li>标绘</li></ul>
+                                   </div>
+                                   <div class="span10">
+                                       <ul class='nav nav-pills'>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='plot'>动态标绘</a></li>
+									       <li><a href='javascript:void(0)' target='_self' data-name='operatePlottingLayer'>图层操作</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='editPlottingLayer'>图层编辑</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='plotSymbol'>鼠标标绘</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='drawGeoGraphicObject'>编程标绘</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='modifySymbolStyle'>属性修改</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='defaultStyle'>缺省属性</a></li>
+										   <li><a href='javascript:void(0)' target='_self' data-name='symbolExtendProperty'>自定义属性</a></li>
+										   <li><a href='javascript:void(0)' target='_self' data-name='querySymbolLib'>查询标号</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='symbolEditor'>编辑器</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='loadSymbolLib'>标号库加载</a></li>
+                                       </ul>
+                                   </div>
+                               </div>
+                           </div>
+                           <div class="container-fluid">
+                               <div class="row-fluid">
+                                   <div class="span2">
+                                       <ul class='nav nav-pills'><span >></span><li>态势图</li></ul>
+                                   </div>
+                                   <div class="span10">
+                                       <ul class='nav nav-pills'>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='saveload'>保存和加载</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='addfile'>叠加态势图</a></li>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='filetransfer'>上传和下载态势图文件</a></li>
+                                       </ul>
+                                   </div>
+                               </div>
+                           </div>
+						   <div class="container-fluid">
+                               <div class="row-fluid">
+                                   <div class="span2">
+                                       <ul class='nav nav-pills'><span >></span><li>查询</li></ul>
+                                   </div>
+                                   <div class="span10">
+                                       <ul class='nav nav-pills'>
+                                           <li><a href='javascript:void(0)' target='_self' data-name='symbolGeometricQuery'>几何查询</a></li>
+                                       </ul>
+                                   </div>
+                               </div>
+                           </div>
 
                        </div>
                        <div class='tab-pane fade' id='others'>

@@ -42,7 +42,7 @@
 
                 layer = new SuperMap.Layer.TiledDynamicRESTLayer("World", url, {transparent: true, cacheEnabled: true}, {maxResolution:"auto"});
 
-                heatMapLayer = new SuperMap.Layer.HeatMapTwo(
+                heatMapLayer = new SuperMap.Layer.HeatMapLayer(
                         "heatMap",
                         {
                             "radius":45,    //热点渲染像素半径

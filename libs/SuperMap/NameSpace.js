@@ -56,5 +56,7 @@ SuperMap.Scheme = SuperMap.Scheme || {};
 
 SuperMap.Tool = SuperMap.Tool || {};
 
+SuperMap.Plot = SuperMap.Plot || {};
+
 
 

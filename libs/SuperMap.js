@@ -647,6 +647,52 @@
 	inputScript('Cloud/TrafficTransferAnalyst/TransferSolutionService.js');
 	inputScript('Cloud/TrafficTransferAnalyst/TransferStopInfo.js');
 	inputScript('Cloud/TrafficTransferAnalyst/TransferWalkInfo.js');
+
+    //标绘库
+    inputScript('Plot/Plotting.js');
+    inputScript('Plot/DefaultStyle.js');
+    inputScript('Plot/Query.js');
+    inputScript('Plot/SitDataManager.js');
+    inputScript('Plot/Editor.js');
+    inputScript('Plot/SymbolLibManager.js');
+    inputScript('Plot/SymbolLib.js');
+    inputScript('Plot/SymbolType.js');
+    inputScript('Plot/ExtendProperty.js');
+    inputScript('Plot/Property.js');
+    inputScript('Plot/AnalysisSymbol.js');
+    inputScript('Plot/SitDataStruct.js');
+    inputScript('Plot/PlottingUtil.js');
+
+    inputScript('Control/PlottingEdit.js');
+
+    inputScript('Layer/PlottingLayer.js');
+
+    inputScript('Handler/GraphicObject.js');
+
+    //图形
+    inputScript('Geometry/Primitives.js');
+    inputScript('Geometry/GeoGraphicObject.js');
+    inputScript('Geometry/DotSymbol.js');
+    inputScript('Geometry/AlgoSymbol.js');
+
+    inputScript('REST/PlotService/GetLibIDsEventArgs.js');
+    inputScript('REST/PlotService/GetLibIDsResult.js');
+    inputScript('REST/PlotService/GetLibIDsService.js');
+    inputScript('REST/PlotService/GetLibInfoEventArgs.js');
+    inputScript('REST/PlotService/GetLibInfoResult.js');
+    inputScript('REST/PlotService/GetLibInfoService.js');
+    inputScript('REST/PlotService/GetSymbolInfoEventArgs.js');
+    inputScript('REST/PlotService/GetSymbolInfoResult.js');
+    inputScript('REST/PlotService/GetSymbolInfoParameters.js');
+    inputScript('REST/PlotService/GetSymbolInfoService.js');
+    inputScript('REST/PlotService/EditSmlFileEventArgs.js');
+    inputScript('REST/PlotService/EditSmlFileResult.js');
+    inputScript('REST/PlotService/EditSmlFileParameters.js');
+    inputScript('REST/PlotService/EditSmlFileService.js');
+    inputScript('REST/PlotService/GetSMLInfosEventArgs.js');
+    inputScript('REST/PlotService/GetSMLInfosParameters.js');
+    inputScript('REST/PlotService/GetSMLInfosResult.js');
+    inputScript('REST/PlotService/GetSMLInfosService.js');
 }
 function inputScript(inc){
     //if (!isWinRT) {

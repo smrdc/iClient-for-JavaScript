@@ -21,6 +21,13 @@ SuperMap.Layer.Baidu = SuperMap.Class(SuperMap.CanvasLayer, {
     offsetXY:null,
 
     /**
+     * APIProperty: dpi
+     * {Float} 屏幕上每英寸包含像素点的个数。
+     * 该参数结合图层比例尺可以推算出该比例尺下图层的分辨率.默认为96。
+     */
+    dpi: 96,
+
+    /**
      * Property: attribution
      * {String} The layer attribution.
      */

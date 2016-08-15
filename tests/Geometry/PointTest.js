@@ -153,7 +153,7 @@ test("testPoint_transform",function(){
     expect(2);
     var point = new SuperMap.Geometry.Point(116,39);
     var point1=point.transform(new SuperMap.Projection("EPSG:4326"),new SuperMap.Projection("EPSG:900913"));
-    equals(point1.x,12913060.930222223,"Function:transform");
+    equals(point1.x,12913060.930222222,"Function:transform");
     equals(point1.y,4721671.571922845,"Function:transform");
     point.destroy();
 });

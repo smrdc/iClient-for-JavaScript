@@ -220,7 +220,7 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
      */
     initialize: function (name, url, params,options) {
         var me = this;
-		me.useCanvas = false;//临时写法
+        me.useCanvas = false;//临时写法
         me.layersInfoInitialized = false;
         me.mapServiceInitialized = false;
         me.tileClass = SuperMap.Tile.VectorImage;
@@ -235,6 +235,8 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
             me.cartoShaders=carto.getShaders();
             this.collectHightlightShader(this.cartoShaders);
         };
+
+
 
         //通过浏览器获取部分信息
         var broz = SuperMap.Browser;
@@ -464,16 +466,18 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
      *  text-comp-op - {String} 同point-comp-op。
      *
      * */
-    setCartoCSS:function(cartoCss){
+    setCartoCSS:function(cartoCss,fromServer){
         if(typeof cartoCss==="string"){
             this.cartoCss=cartoCss;
             var carto=this.cartocss=new SuperMap.CartoCSS(cartoCss);
             this.cartoShaders=carto.getShaders();
+            this.cartoShaders.fromServer = fromServer;
             this.collectHightlightShader(this.cartoShaders);
             this.unRegisterMouseEvent("mousemove");
             this.unRegisterMouseEvent("click");
             this.currentHightlightShader=null;
             this.wholeHightligthtShader=null;
+            this.resetCartoCSS = true;
             //遍历切片，对每个切片进行CartoCSS样式的重新设置。
             for (var i = 0,len00=this.grid.length; i < len00; i++) {
                 var rowTiles = this.grid[i];
@@ -482,6 +486,7 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
                     rowTiles[j].refresh(true);
                 }
             }
+            this.resetCartoCSS = false;
             this.events.triggerEvent("cartocssChanged",{"cartoCSS":this.cartoCss});
         }
     },
@@ -836,14 +841,14 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
                                 this.zoomDuration+this.zoomDelay);
                         } else {
                             this._timeoutId&&window.clearTimeout(this._timeoutId);
-							for(var i=0,len=this.grid.length;i<len;i++){
-								var row=this.grid[i];
-								for(var j=0,len0=row.length;j<len0;j++){
-									var tile=row[j];
-									tile&&tile.clear();
-								}
-							}
-							this.initGriddedTiles(bounds);
+                            for(var i=0,len=this.grid.length;i<len;i++){
+                                var row=this.grid[i];
+                                for(var j=0,len0=row.length;j<len0;j++){
+                                    var tile=row[j];
+                                    tile&&tile.clear();
+                                }
+                            }
+                            this.initGriddedTiles(bounds);
                             //通过改变量计算canvas的地理位置。
                             this.lastCanvasPosition = this.map.getLonLatFromLayerPx(new SuperMap.Pixel(0,0));
                             this.lastResolution = this.map.getResolution();               
@@ -1010,6 +1015,15 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
             tileSize = me.tileSize,
             scale = me.scales[xyz.z];
         if (!scale)scale = this.getScaleForZoom(xyz.z);
+        //对比本图层与底图的比例尺，如果跟底图的差距太大则选用底图的比例尺，保证底图与叠加图层的比例尺一致
+        if(this.map && this.map.baseLayer && this !== this.map.baseLayer){
+            var baseScale = this.map.baseLayer.getScaleForZoom(xyz.z);
+            var PRECISION = [1e-9,2e-9,4e-9,8e-9,1.6e-8,3.2e-8,6.4e-8,1.28e-7,2.56e-7,5.12e-7,1.024e-6,2.048e-6,4.096e-6,8.192e-6,1.6384e-5,3.2768e-5,6.5536e-5,1.31072e-4];
+            var idx = xyz.z > PRECISION.length ? PRECISION.length : xyz.z;
+            if(baseScale &&Math.abs(baseScale-scale) > PRECISION[idx]){
+                scale = baseScale;
+            }
+        }
         newParams = {
             "width": tileSize.w,
             "height": tileSize.h,
@@ -1018,7 +1032,7 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
             "scale": scale
         };
         if (SuperMap.Credential.CREDENTIAL) {
-            newParams.token = SuperMap.Credential.CREDENTIAL.getValue();
+            newParams[SuperMap.Credential.CREDENTIAL.name] = SuperMap.Credential.CREDENTIAL.getValue();
         }
         if (!me.params.cacheEnabled) {
             newParams.t = new Date().getTime();
@@ -1120,6 +1134,52 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
         this.events.triggerEvent("addtile", {tile: tile});
         return tile;
     },
+
+    /**
+     * Method: getVectorStyles
+     * 获取服务端的矢量瓦片样式表，格式为CartoCSS
+     * */
+    getVectorStyles: function(){
+        var me = this;
+        var layersUrl = me.url + "/tileFeature/vectorstyles.json";
+        var isInTheSameDomain=SuperMap.Util.isInTheSameDomain(layersUrl);
+        if(!isInTheSameDomain){
+            layersUrl=layersUrl.replace(/.json/,".jsonp");
+        }
+		if(SuperMap.Credential.CREDENTIAL){
+			layersUrl = layersUrl + "?" + SuperMap.Credential.CREDENTIAL.getUrlParameters();
+		}
+        SuperMap.Util.committer({
+            url:layersUrl,
+            isInTheSameDomain:isInTheSameDomain,
+            method:"GET",
+            success:function(isInTheSameDomain){
+                return function(result){
+                    var styles = isInTheSameDomain?new SuperMap.Format.JSON().read(result.responseText):result;
+                    if(!styles){
+                        return;
+                    }
+                    if(styles.style && styles.type === 'cartoCSS'){
+                        var style = styles.style;
+                        style = style.replace(/[@]/gi,"___");
+                        style = style.replace(/\\#/gi,"___");
+                        style = style.replace(/[#]/gi,"\n#");
+                        me.setCartoCSS(style,true);
+                    }
+                    if (me.mapServiceInitialized) {
+                        me.events.triggerEvent('layerInitialized', me);
+                    }
+                }
+            }(isInTheSameDomain),
+            failure:function(){
+                if (me.mapServiceInitialized) {
+                    me.events.triggerEvent('layerInitialized', me);
+                }
+            },
+            scope:me
+        });
+    },
+
     /**
      * Method:  initializeLayersInfo
      * 初使化图层信息。
@@ -1131,6 +1191,9 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
         if(!isInTheSameDomain){
             layersUrl=layersUrl.replace(/.json/,".jsonp");
         }
+		if(SuperMap.Credential.CREDENTIAL){
+			layersUrl = layersUrl + "?" + SuperMap.Credential.CREDENTIAL.getUrlParameters();
+		}
         SuperMap.Util.committer({
             url:layersUrl,
             isInTheSameDomain:isInTheSameDomain,
@@ -1151,7 +1214,9 @@ SuperMap.Layer.TiledVectorLayer = SuperMap.Class(SuperMap.Layer.Grid, {
                         }
                     }
                     me.layersInfo=layersInfo;
-                    if (me.mapServiceInitialized) {
+                    if(!this.cartoShaders){
+                        me.getVectorStyles();
+                    }else if (me.mapServiceInitialized){
                         me.events.triggerEvent('layerInitialized', me);
                     }
                 }

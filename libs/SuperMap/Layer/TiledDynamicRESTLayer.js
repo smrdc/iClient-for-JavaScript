@@ -444,6 +444,15 @@ SuperMap.Layer.TiledDynamicRESTLayer = SuperMap.Class(SuperMap.CanvasLayer, {
         //在没有设置任何投影的情况下，比例尺可能大于1，为了提高容错能力，注释掉比例尺矫正函数。 maoshuyu
         //scale = SuperMap.Util.normalizeScale(scale);
         if(!scale)scale = this.getScaleForZoom(xyz.z);
+        //对比本图层与底图的比例尺，如果跟底图的差距太大则选用底图的比例尺，保证底图与叠加图层的比例尺一致
+        if(this.map && this.map.baseLayer && this !== this.map.baseLayer){
+            var baseScale = this.map.baseLayer.getScaleForZoom(xyz.z);
+            var PRECISION = [1e-9,2e-9,4e-9,8e-9,1.6e-8,3.2e-8,6.4e-8,1.28e-7,2.56e-7,5.12e-7,1.024e-6,2.048e-6,4.096e-6,8.192e-6,1.6384e-5,3.2768e-5,6.5536e-5,1.31072e-4];
+            var idx = xyz.z > PRECISION.length ? PRECISION.length : xyz.z;
+            if(baseScale &&Math.abs(baseScale-scale) > PRECISION[idx]){
+                scale = baseScale;
+            }
+        }
         newParams = {
             "width" : tileSize.w,
             "height" : tileSize.h,

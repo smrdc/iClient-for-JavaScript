@@ -116,7 +116,8 @@ SuperMap.REST.SetLayerStatusService = SuperMap.Class(SuperMap.ServiceBase,{
             me.request({
                 method: method,
                 scope: me,
-                success: me.createTempLayerComplete
+                success: me.createTempLayerComplete,
+                failure: me.setLayerFailed
             });
         }
         else
@@ -141,7 +142,8 @@ SuperMap.REST.SetLayerStatusService = SuperMap.Class(SuperMap.ServiceBase,{
                 method: "PUT",
                 data: jsonParameters,
                 scope: me,
-                success: me.setLayerComplted
+                success: me.setLayerComplted ,
+                failure: me.setLayerFailed
             });
         }
     },
@@ -212,14 +214,14 @@ SuperMap.REST.SetLayerStatusService = SuperMap.Class(SuperMap.ServiceBase,{
             error = null,
             serviceException = null,
             qe = null;
-//        result = SuperMap.Util.transformResult(result);
-//        error = result.error;
-//        if (!error) {
-//            return;
-//        }
-//        serviceException = SuperMap.ServiceException.fromJson(error);
-//        qe = new SuperMap.ServiceFailedEventArgs(serviceException, result);
-//        me.events.triggerEvent("processFailed", qe);
+        result = SuperMap.Util.transformResult(result);
+        error = result.error;
+        if (!error) {
+            return;
+        }
+        serviceException = SuperMap.ServiceException.fromJson(error);
+        qe = new SuperMap.ServiceFailedEventArgs(serviceException, result);
+        me.events.triggerEvent("processFailed", qe);
     },
 
 

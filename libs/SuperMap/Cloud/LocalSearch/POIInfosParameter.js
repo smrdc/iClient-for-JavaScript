@@ -35,6 +35,12 @@ SuperMap.Cloud.POIInfosParameter = SuperMap.Class({
 	 * {Number} 搜索服务结果分页页码，默认1，表示返回第一页（即前10条)记录。
      */
     pageNum: 1,
+
+    /**
+     * APIProperty: to
+     * {Number} 输出结果坐标类型，默认值：910101。支持的坐标类型编码参考 http://www.supermapol.com/developer/webapi.html?title=convert 。
+     */
+    to: 910101,
     
     /**
      * Constructor: SuperMap.Cloud.POIInfosParameter
@@ -66,6 +72,7 @@ SuperMap.Cloud.POIInfosParameter = SuperMap.Class({
         me.city = null;
         me.pageSize = null;
         me.pageNum = null;
+        me.to = null;
     },
     
     CLASS_NAME: "SuperMap.Cloud.POIInfosParameter"

@@ -2,17 +2,17 @@
 SuperMap.Cloud.GeocodingEventArgs = SuperMap.Class(SuperMap.ServiceEventArgs, {
     /**
      * APIProperty: result
-     * {Array(<SuperMap.Cloud.GeocodingResult>)} 路径导航分析返回的结果。
+     * {Array(<SuperMap.Cloud.GeocodingResult>)} 地理编码返回的结果。
      */
     result: null,
 
     /**
      * Constructor: SuperMap.Cloud.GeocodingEventArgs
-     * 路径导航分析事件数据类构造函数。
+     * 地理编码服务结果查询事件类构造函数。
      *
      * Parameters:
-     * result - {<Object>} 路径导航分析的返回结果。
-     * originResult - {Object} 从服务端获取的 Json 对象表示的路径导航分析结果。
+     * result - {<Object>} 地理编码查询返回的结果。
+     * originResult - {Object} 从服务端获取的 Json 对象表示的地理编码查询结果。
      */
     initialize: function(result, originResult) {
         SuperMap.ServiceEventArgs.prototype.initialize.apply(this, [originResult]);
